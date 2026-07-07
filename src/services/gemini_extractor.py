@@ -24,7 +24,7 @@ class GeminiExtractor:
         genai.configure(api_key=self.api_key)
         
         # 3. Initialize the generative model
-        self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
 
     @staticmethod
     def _extract_text_from_pdf(pdf_path: str) -> str:
