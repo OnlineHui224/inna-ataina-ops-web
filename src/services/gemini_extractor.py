@@ -1,7 +1,5 @@
 import json
-import os
 from typing import Any, Dict, List
-
 import google.generativeai as genai
 import PyPDF2
 from PIL import Image
@@ -10,18 +8,22 @@ from pydantic import ValidationError
 from src.core.logger import logger
 from src.models.data_schemas import TicketData
 
-
 class GeminiExtractor:
-    """Extract structured airline ticket data using Gemini + Pydantic validation."""
-
     def __init__(self, api_key: str):
-        if not api_key:
-            raise ValueError("Gemini API key is not configured.")
+        # 1. Clean the API key of any accidental hidden spaces or quotes
+        self.api_key = api_key.strip() if api_key else ""
+        self.last_error = ""
+        
+        if not self.api_key:
+            logger.error("No API key provided to GeminiExtractor.")
+            raise ValueError("Gemini API key is missing.")
 
-        self.api_key = api_key
+        # 2. CRITICAL FIX: Explicitly configure the API key right here.
+        # This overrides Streamlit's environment and forces it to use your exact key.
         genai.configure(api_key=self.api_key)
-
-        self.model = genai.GenerativeModel("gemini-2.5-flash")
+        
+        # 3. Initialize the generative model
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
 
     @staticmethod
     def _extract_text_from_pdf(pdf_path: str) -> str:
