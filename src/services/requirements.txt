@@ -1,4 +1,5 @@
 streamlit
 google-generativeai
 pydantic
-customtkinter
+PyPDF2
+Pillow
