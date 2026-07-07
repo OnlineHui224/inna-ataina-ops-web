@@ -13,15 +13,14 @@ if str(CURRENT_DIR) not in sys.path:
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-# Import your custom tools
 from gemini_extractor import GeminiExtractor
 
-# --- FIX: THIS WILL NOW PRINT THE EXACT ERROR ON SCREEN ---
+# --- IMPORTING YOUR EXACT DOCX GENERATOR ---
 try:
-    from docx_generator import DocumentGenerator
+    from docx_generator import DocxGenerator
     DOCX_ERROR = None
 except Exception as e:
-    DocumentGenerator = None
+    DocxGenerator = None
     DOCX_ERROR = str(e)
 
 # --- API KEY FUNCTION ---
@@ -100,20 +99,29 @@ if st.session_state.extracted_data is not None:
     
     with st.sidebar:
         if st.button("2. Generate Document", type="primary"):
-            if DocumentGenerator is None:
-                # IT WILL NOW TELL US EXACTLY WHY IT FAILED
-                st.error(f"Cannot load your document file! The computer says: {DOCX_ERROR}")
+            if DocxGenerator is None:
+                st.error(f"Cannot load your document file! Error: {DOCX_ERROR}")
             else:
                 with st.spinner("Generating Word Document..."):
                     try:
-                        generator = DocumentGenerator()
-                        doc_file_path = generator.create_document(st.session_state.extracted_data)
+                        # Setup the exact folder paths your code expects
+                        template_path = os.path.join(str(REPO_ROOT), "assets", "template.docx")
+                        output_dir = os.path.join(str(REPO_ROOT), "output")
+                        
+                        # Use your exact class name and required variables
+                        generator = DocxGenerator(template_path=template_path, output_dir=output_dir)
+                        
+                        # Use your exact function name (.generate instead of .create_document)
+                        doc_file_path = generator.generate(st.session_state.extracted_data)
+                        
+                        # Grab the safe file name your code created
+                        final_file_name = os.path.basename(doc_file_path)
                         
                         with open(doc_file_path, "rb") as file:
                             st.download_button(
                                 label="📥 Download Itinerary (Word Doc)",
                                 data=file,
-                                file_name="Inna_Ataina_Itinerary.docx",
+                                file_name=final_file_name,
                                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                             )
                     except Exception as e:
