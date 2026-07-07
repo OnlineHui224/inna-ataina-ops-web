@@ -1,11 +1,22 @@
-import sys
 import os
-# This line tells Python exactly where your project folders are so it doesn't get lost
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+import sys
+from pathlib import Path
+import tempfile
 
 import streamlit as st
-import tempfile
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from src.services.gemini_extractor import GeminiExtractor
+
+
+def _get_gemini_api_key() -> str:
+    if "GEMINI_API_KEY" in st.secrets:
+        return st.secrets["GEMINI_API_KEY"]
+
+    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
 
 # 1. Setup the Webpage Title and Header
 st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="centered")
@@ -31,7 +42,12 @@ if st.button("Extract Ticket Data", type="primary"):
 
             try:
                 # Wake up your custom AI engine
-                extractor = GeminiExtractor()
+                api_key = _get_gemini_api_key()
+                if not api_key:
+                    st.error("GEMINI_API_KEY is not configured in Streamlit secrets or environment variables.")
+                    st.stop()
+
+                extractor = GeminiExtractor(api_key)
                 extracted_data = extractor.process_document(tmp_path)
                 
                 st.success("Extraction 100% Successful!")
