@@ -16,12 +16,13 @@ if str(REPO_ROOT) not in sys.path:
 # Import your custom tools
 from gemini_extractor import GeminiExtractor
 
-# Try to import your document generator (adjust the names if your file uses different ones)
+# --- FIX: THIS WILL NOW PRINT THE EXACT ERROR ON SCREEN ---
 try:
     from docx_generator import DocumentGenerator
-except ImportError:
+    DOCX_ERROR = None
+except Exception as e:
     DocumentGenerator = None
-
+    DOCX_ERROR = str(e)
 
 # --- API KEY FUNCTION ---
 def _get_gemini_api_key() -> str:
@@ -36,7 +37,6 @@ def _get_gemini_api_key() -> str:
 # --- 1. PAGE SETUP & MEMORY ---
 st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="centered")
 
-# Create a "Memory" to hold the ticket data after it is extracted
 if "extracted_data" not in st.session_state:
     st.session_state.extracted_data = None
 
@@ -80,10 +80,7 @@ if st.button("1. Extract Ticket Data", type="primary"):
                     st.code(getattr(extractor, "last_error", "Unknown Error"))
                 else:
                     st.success("Extraction 100% Successful!")
-                    
-                    # 🚨 SAVE TO MEMORY SO THE DOCX GENERATOR CAN USE IT
                     st.session_state.extracted_data = extracted_data
-                    
                     st.json(extracted_data.model_dump()) 
                 
             except Exception as e:
@@ -96,24 +93,22 @@ if st.button("1. Extract Ticket Data", type="primary"):
         st.warning("Please upload a ticket first!")
 
 
-# --- BUTTON 2: GENERATE DOCUMENT (Only shows if data exists in memory) ---
+# --- BUTTON 2: GENERATE DOCUMENT ---
 if st.session_state.extracted_data is not None:
     st.divider()
     st.success("✅ Ticket data saved in memory! Ready to generate document.")
     
-    # We put the document button in the sidebar to match your screenshot
     with st.sidebar:
         if st.button("2. Generate Document", type="primary"):
             if DocumentGenerator is None:
-                st.error("Could not load `docx_generator.py`. Please check your file imports!")
+                # IT WILL NOW TELL US EXACTLY WHY IT FAILED
+                st.error(f"Cannot load your document file! The computer says: {DOCX_ERROR}")
             else:
                 with st.spinner("Generating Word Document..."):
                     try:
-                        # Wake up your document generator and pass it the memory data
                         generator = DocumentGenerator()
                         doc_file_path = generator.create_document(st.session_state.extracted_data)
                         
-                        # Provide the final download button
                         with open(doc_file_path, "rb") as file:
                             st.download_button(
                                 label="📥 Download Itinerary (Word Doc)",
