@@ -2,21 +2,26 @@ import os
 import sys
 from pathlib import Path
 import tempfile
-
 import streamlit as st
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+# --- OUR PATH FIX (Do not remove this!) ---
+CURRENT_DIR = Path(__file__).parent.resolve()
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
 
-from src.services.gemini_extractor import GeminiExtractor
+from gemini_extractor import GeminiExtractor
 
 
+# --- COPILOT'S IMPROVED API KEY FUNCTION ---
 def _get_gemini_api_key() -> str:
-    if "GEMINI_API_KEY" in st.secrets:
-        return st.secrets["GEMINI_API_KEY"]
+    try:
+        if "GEMINI_API_KEY" in st.secrets and st.secrets["GEMINI_API_KEY"]:
+            return str(st.secrets["GEMINI_API_KEY"]).strip()
+    except Exception:
+        pass
 
-    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
+    return (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
+
 
 # 1. Setup the Webpage Title and Header
 st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="centered")
@@ -40,8 +45,8 @@ if st.button("Extract Ticket Data", type="primary"):
                 tmp_file.write(uploaded_file.getvalue())
                 tmp_path = tmp_file.name
 
+            # --- COPILOT'S IMPROVED TRY BLOCK ---
             try:
-                # Wake up your custom AI engine
                 api_key = _get_gemini_api_key()
                 if not api_key:
                     st.error("GEMINI_API_KEY is not configured in Streamlit secrets or environment variables.")
@@ -50,10 +55,14 @@ if st.button("Extract Ticket Data", type="primary"):
                 extractor = GeminiExtractor(api_key)
                 extracted_data = extractor.process_document(tmp_path)
                 
-                st.success("Extraction 100% Successful!")
-                
-                # Show the clean formatted aviation data right on the website
-                st.json(extracted_data.model_dump()) 
+                if extracted_data is None:
+                    st.error("Extraction failed. The AI returned an empty response.")
+                    # Copilot's trick to show the exact error from the engine:
+                    st.code(getattr(extractor, "last_error", "Check ticket formatting or API key quota."))
+                else:
+                    st.success("Extraction 100% Successful!")
+                    # Show the clean formatted aviation data right on the website
+                    st.json(extracted_data.model_dump()) 
                 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
