@@ -104,17 +104,14 @@ if st.session_state.extracted_data is not None:
             else:
                 with st.spinner("Generating Word Document..."):
                     try:
-                        # Setup the exact folder paths your code expects
-                        template_path = os.path.join(str(REPO_ROOT), "assets", "template.docx")
+                        # --- UPDATED: EXACT TEMPLATE NAME ---
+                        template_path = os.path.join(str(REPO_ROOT), "assets", "blank_template.docx")
                         output_dir = os.path.join(str(REPO_ROOT), "output")
                         
-                        # Use your exact class name and required variables
                         generator = DocxGenerator(template_path=template_path, output_dir=output_dir)
                         
-                        # Use your exact function name (.generate instead of .create_document)
                         doc_file_path = generator.generate(st.session_state.extracted_data)
                         
-                        # Grab the safe file name your code created
                         final_file_name = os.path.basename(doc_file_path)
                         
                         with open(doc_file_path, "rb") as file:
