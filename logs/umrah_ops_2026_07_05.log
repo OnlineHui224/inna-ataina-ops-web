@@ -1,0 +1,274 @@
+2026-07-05 06:52:57,060 - INFO - main - Application starting...
+2026-07-05 06:52:57,370 - INFO - config_manager - Configuration saved.
+2026-07-05 07:08:10,401 - INFO - main - Application starting...
+2026-07-05 07:08:10,626 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:08:46,932 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 07:08:48,430 - ERROR - gemini_extractor - Extraction failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+2026-07-05 07:09:00,615 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/WhatsApp Image 2026-07-02 at 8.47.24 PM.jpeg
+2026-07-05 07:09:01,933 - ERROR - gemini_extractor - Extraction failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+2026-07-05 07:09:10,576 - INFO - main - Application shutting down.
+2026-07-05 07:11:01,436 - INFO - main - Application starting...
+2026-07-05 07:11:01,563 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:11:30,227 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation July 23 for MS MARYAM SAMBO BASHIR.pdf
+2026-07-05 07:11:31,078 - ERROR - gemini_extractor - Extraction failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.
+2026-07-05 07:15:10,683 - INFO - main - Application shutting down.
+2026-07-05 07:17:59,758 - INFO - main - Application starting...
+2026-07-05 07:17:59,934 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:18:17,571 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 07:18:34,373 - ERROR - gemini_extractor - Extraction failed: 4 validation errors for TicketData
+passenger_name
+  Field required [type=missing, input_value={'pax_name': 'SILIF AT AS...rry-on: 1 piece x 8 kg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+pnr
+  Field required [type=missing, input_value={'pax_name': 'SILIF AT AS...rry-on: 1 piece x 8 kg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+primary_carrier
+  Field required [type=missing, input_value={'pax_name': 'SILIF AT AS...rry-on: 1 piece x 8 kg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights
+  Field required [type=missing, input_value={'pax_name': 'SILIF AT AS...rry-on: 1 piece x 8 kg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:19:55,420 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/WhatsApp Image 2026-07-02 at 8.47.24 PM.jpeg
+2026-07-05 07:20:07,603 - ERROR - gemini_extractor - Extraction failed: 3 validation errors for TicketData
+passenger_name
+  Field required [type=missing, input_value={'pax_adults': 1, 'pax_ch...', 'class': 'Economy'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+primary_carrier
+  Field required [type=missing, input_value={'pax_adults': 1, 'pax_ch...', 'class': 'Economy'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights
+  Field required [type=missing, input_value={'pax_adults': 1, 'pax_ch...', 'class': 'Economy'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:20:22,155 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/GONI01.pdf
+2026-07-05 07:20:29,490 - ERROR - gemini_extractor - Extraction failed: 3 validation errors for TicketData
+passenger_name
+  Field required [type=missing, input_value={'booking_reference': '8I...6334, 'currency': 'NGN'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+pnr
+  Field required [type=missing, input_value={'booking_reference': '8I...6334, 'currency': 'NGN'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights
+  Field required [type=missing, input_value={'booking_reference': '8I...6334, 'currency': 'NGN'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:32:25,741 - INFO - main - Application starting...
+2026-07-05 07:32:25,918 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:32:39,868 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation July 23 for MS MARYAM SAMBO BASHIR.pdf
+2026-07-05 07:32:54,092 - ERROR - gemini_extractor - Extraction failed: 18 validation errors for TicketData
+passenger_name
+  Field required [type=missing, input_value={'reservation_code': 'SXP...nal': 'Not Available'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+pnr
+  Field required [type=missing, input_value={'reservation_code': 'SXP...nal': 'Not Available'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.departure_city
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.arrival_city
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.date
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.departure_city
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.arrival_city
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.date
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.departure_city
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.arrival_city
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.date
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.departure_city
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.arrival_city
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.date
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:33:56,931 - INFO - main - Application shutting down.
+2026-07-05 07:34:48,377 - INFO - main - Application starting...
+2026-07-05 07:34:48,552 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:34:57,391 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation July 23 for MS MARYAM SAMBO BASHIR.pdf
+2026-07-05 07:35:16,978 - ERROR - gemini_extractor - Extraction failed: 10 validation errors for TicketData
+passenger_name
+  Field required [type=missing, input_value={'reservation_code': 'SXP...nal': 'Not Available'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+pnr
+  Field required [type=missing, input_value={'reservation_code': 'SXP...nal': 'Not Available'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.date
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.0.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 094...terminal': 'TERMINAL 2'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.date
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 044...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.date
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 040...terminal': 'TERMINAL 1'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.date
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.carrier
+  Field required [type=missing, input_value={'flight_number': 'ET 094...minal': 'Not Available'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:38:09,805 - INFO - main - Application shutting down.
+2026-07-05 07:39:28,361 - INFO - main - Application starting...
+2026-07-05 07:39:28,534 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:40:04,400 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 07:40:12,010 - ERROR - gemini_extractor - Extraction failed: 2 validation errors for TicketData
+pnr
+  Field required [type=missing, input_value={'reservation_code': 'R62...parture_time': '19:20'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights
+  Field required [type=missing, input_value={'reservation_code': 'R62...parture_time': '19:20'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:43:09,394 - INFO - main - Application shutting down.
+2026-07-05 07:44:01,185 - INFO - main - Application starting...
+2026-07-05 07:44:01,352 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 07:44:11,395 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/WhatsApp Image 2026-07-02 at 8.47.24 PM.jpeg
+2026-07-05 07:44:21,499 - ERROR - gemini_extractor - Extraction failed: 4 validation errors for TicketData
+flights.0.date
+  Field required [type=missing, input_value={'flight_number': 'TK626'...mber': '235-2526459603'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.1.date
+  Field required [type=missing, input_value={'flight_number': 'TK108'...mber': '235-2526459603'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.2.date
+  Field required [type=missing, input_value={'flight_number': 'QR1187...mber': '157-7499033281'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights.3.date
+  Field required [type=missing, input_value={'flight_number': 'QR1407...mber': '157-7499033281'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 07:44:32,067 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 07:44:42,682 - ERROR - gemini_extractor - Extraction failed: 2 validation errors for TicketData
+pnr
+  Field required [type=missing, input_value={'reservation_code': 'R62...r': 'TURKISH AIRLINES'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+flights
+  Field required [type=missing, input_value={'reservation_code': 'R62...r': 'TURKISH AIRLINES'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-07-05 08:25:24,963 - INFO - main - Application starting...
+2026-07-05 08:25:25,163 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 08:25:33,426 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 08:25:45,625 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:25:45,626 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:26:14,551 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:26:32,457 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/WhatsApp Image 2026-07-02 at 8.47.24 PM.jpeg
+2026-07-05 08:26:38,587 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:26:38,588 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:26:49,101 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:34:52,190 - INFO - main - Application shutting down.
+2026-07-05 08:37:01,447 - INFO - main - Application starting...
+2026-07-05 08:37:01,803 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 08:37:15,303 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/0652197038059.pdf
+2026-07-05 08:37:21,505 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:37:21,506 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:37:26,261 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:37:26,335 - INFO - docx_generator - DOCX saved successfully at output/Mrs_Rakiya_Zubairu_Itinerary.docx
+2026-07-05 08:38:11,049 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:38:11,127 - INFO - docx_generator - DOCX saved successfully at output/Mrs_Rakiya_Zubairu_Itinerary.docx
+2026-07-05 08:45:14,444 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/WhatsApp Image 2026-07-02 at 8.47.24 PM.jpeg
+2026-07-05 08:45:22,306 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:45:22,306 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:45:25,161 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:45:25,212 - INFO - docx_generator - DOCX saved successfully at output/SILIFATASABI_AHMED_Itinerary.docx
+2026-07-05 08:48:09,184 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/GONI01.pdf
+2026-07-05 08:48:17,370 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:48:17,370 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:48:59,415 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/GONI01.pdf
+2026-07-05 08:49:07,201 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 08:49:07,202 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 08:49:10,083 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 08:49:10,129 - INFO - docx_generator - DOCX saved successfully at output/Mr_Adamu_Abubakar_Goni_Itinerary.docx
+2026-07-05 09:01:35,632 - INFO - main - Application shutting down.
+2026-07-05 09:10:51,616 - INFO - main - Application starting...
+2026-07-05 09:10:51,813 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 09:25:17,700 - INFO - main - Application shutting down.
+2026-07-05 09:41:03,454 - INFO - main - Application starting...
+2026-07-05 09:41:03,610 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 09:41:29,922 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/0652197038059.pdf
+2026-07-05 09:41:36,576 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 09:41:36,576 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 09:41:41,773 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 09:41:41,864 - INFO - docx_generator - DOCX saved successfully at output/Mrs_Rakiya_Zubairu_Itinerary.docx
+2026-07-05 09:57:38,582 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 09:57:38,624 - INFO - docx_generator - DOCX saved successfully at output/Mrs_Rakiya_Zubairu_Itinerary.docx
+2026-07-05 10:24:21,111 - INFO - main - Application shutting down.
+2026-07-05 10:24:39,372 - INFO - main - Application starting...
+2026-07-05 10:24:39,543 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 10:24:50,942 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Itinerary.pdf
+2026-07-05 10:24:56,752 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 10:24:56,752 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 10:25:04,491 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 10:25:04,713 - INFO - docx_generator - DOCX saved successfully at output/Zulaykhah_Anike_Adebisi_Itinerary.docx
+2026-07-05 10:38:14,782 - INFO - main - Application shutting down.
+2026-07-05 10:41:50,837 - INFO - main - Application starting...
+2026-07-05 10:41:50,985 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 10:42:44,046 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/BALARABE SHITTU.jpg
+2026-07-05 10:43:25,418 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 10:43:25,418 - INFO - validator - Validation complete. Found 3 warnings.
+2026-07-05 10:44:02,542 - INFO - main - Application shutting down.
+2026-07-05 10:46:25,786 - INFO - main - Application starting...
+2026-07-05 10:46:25,911 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 10:46:34,145 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TicketDetails-3.pdf
+2026-07-05 10:46:46,783 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 10:46:46,784 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 10:46:49,450 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 10:46:49,686 - INFO - docx_generator - DOCX saved successfully at output/SILIF_AT_ASABI_AHMED_Itinerary.docx
+2026-07-05 10:46:52,830 - INFO - main - Application shutting down.
+2026-07-05 10:48:00,489 - INFO - main - Application starting...
+2026-07-05 10:48:00,633 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 10:48:13,194 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/GONI01.pdf
+2026-07-05 10:48:26,195 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 10:48:26,195 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 10:48:30,511 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 10:48:30,748 - INFO - docx_generator - DOCX saved successfully at output/Mr_Adamu_Abubakar_Goni_Itinerary.docx
+2026-07-05 10:48:34,553 - INFO - main - Application shutting down.
+2026-07-05 20:24:43,803 - INFO - main - Application starting...
+2026-07-05 20:24:44,253 - INFO - config_manager - Configuration loaded successfully.
+2026-07-05 20:26:46,554 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/sabo gobir.pdf
+2026-07-05 20:26:55,828 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 20:26:55,829 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 20:26:57,311 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 20:26:57,611 - INFO - docx_generator - DOCX saved successfully at output/SARO_GOBIR_IMRAN_Itinerary.docx
+2026-07-05 20:57:02,336 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation August 12 for MR ABDUSSALAM MUBARAK.pdf
+2026-07-05 20:57:10,289 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 20:57:10,292 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 20:58:37,336 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation August 12 for MR ABDUSSALAM MUBARAK.pdf
+2026-07-05 20:58:44,485 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-05 20:58:44,487 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-05 20:58:46,314 - INFO - docx_generator - Starting DOCX generation...
+2026-07-05 20:58:46,519 - INFO - docx_generator - DOCX saved successfully at output/MR_ABDUSSALAM_MUBARAK_MR_HAMMED_ABIOYE_MR_ABDULQUADRI_TUNDE_SAADUDEEN_Itinerary.docx
+2026-07-05 22:51:19,378 - INFO - main - Application shutting down.

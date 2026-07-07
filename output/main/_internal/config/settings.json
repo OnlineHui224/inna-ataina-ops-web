@@ -1,0 +1,6 @@
+{
+    "gemini_api_key": "AQ.Ab8RN6K1Rf91FcwhqeBOAvQ-JpHP3DsEPxrrcboZhQY7nDhnJA",
+    "template_path": "assets/blank_template.docx",
+    "output_directory": "output/",
+    "theme": "System"
+}

@@ -1,0 +1,46 @@
+2026-07-06 10:20:20,098 - INFO - main - Application starting...
+2026-07-06 10:20:20,645 - INFO - config_manager - Configuration loaded successfully.
+2026-07-06 10:20:44,834 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation August 12 for MR ABDUSSALAM MUBARAK.pdf
+2026-07-06 10:20:55,682 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 10:20:55,699 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 10:21:00,502 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 10:21:00,659 - INFO - docx_generator - DOCX saved successfully at output/MR_ABDUSSALAM_MUBARAK_Itinerary.docx
+2026-07-06 10:28:09,166 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Itinerary-7-1.pdf
+2026-07-06 10:28:16,427 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 10:28:16,429 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 10:28:19,553 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 10:28:19,679 - INFO - docx_generator - DOCX saved successfully at output/SARO_ALHAJA_IYABO_Itinerary.docx
+2026-07-06 10:44:48,644 - INFO - main - Application shutting down.
+2026-07-06 11:50:27,347 - INFO - main - Application starting...
+2026-07-06 11:50:27,554 - INFO - config_manager - Configuration loaded successfully.
+2026-07-06 11:50:36,169 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Itinerary-7-1.pdf
+2026-07-06 11:50:45,112 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 11:50:45,113 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 11:50:47,950 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 11:50:48,002 - INFO - docx_generator - DOCX saved successfully at output/SARO_ALHAJA_IYABO_Itinerary.docx
+2026-07-06 12:35:24,271 - INFO - main - Application shutting down.
+2026-07-06 12:38:41,369 - INFO - main - Application starting...
+2026-07-06 12:38:41,601 - INFO - config_manager - Configuration loaded successfully.
+2026-07-06 12:41:48,145 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Electronic Receipt_065-2199113646_Mubarak Maccido.pdf
+2026-07-06 12:41:54,712 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 12:41:54,752 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 12:42:10,700 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 12:42:10,774 - INFO - docx_generator - DOCX saved successfully at output/Mubarak_Maccido_Itinerary.docx
+2026-07-06 13:02:35,319 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Travel Reservation July 29 for MR TAOFEEQ ADEREMI SALAWU.PDF
+2026-07-06 13:02:41,697 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 13:02:41,698 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 13:03:08,253 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 13:03:08,555 - INFO - docx_generator - DOCX saved successfully at output/MR_TAOFEEQ_ADEREMI_SALAWU_Itinerary.docx
+2026-07-06 13:44:19,733 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/TESTING.PDF
+2026-07-06 13:44:26,721 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 13:44:26,722 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 13:44:30,463 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 13:44:30,575 - INFO - docx_generator - DOCX saved successfully at output/MR_TAOFEEQ_ADEREMI_SALAWU_Itinerary.docx
+2026-07-06 13:47:45,487 - INFO - main - Application shutting down.
+2026-07-06 13:48:06,483 - INFO - main - Application starting...
+2026-07-06 13:48:06,945 - INFO - config_manager - Configuration loaded successfully.
+2026-07-06 13:48:35,459 - INFO - gemini_extractor - Starting AI extraction for: C:/Users/HP/Downloads/Electronic Receipt_065-2199666089_Salamatu Mohammed Balarabe Shittu.pdf
+2026-07-06 13:48:41,826 - INFO - gemini_extractor - AI extraction successful and schema-validated.
+2026-07-06 13:48:41,827 - INFO - validator - Validation complete. Found 0 warnings.
+2026-07-06 13:48:44,622 - INFO - docx_generator - Starting DOCX generation...
+2026-07-06 13:48:44,812 - INFO - docx_generator - DOCX saved successfully at output/Salamatu_Mohammed_Balarabe_Shittu_Itinerary.docx
