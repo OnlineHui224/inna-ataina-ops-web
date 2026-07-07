@@ -1,3 +1,4 @@
+import os  # <--- JUST ADD THIS LINE AT THE VERY TOP
 import json
 from typing import Any, Dict, List
 import google.generativeai as genai
