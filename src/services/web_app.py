@@ -4,11 +4,20 @@ from pathlib import Path
 import tempfile
 import streamlit as st
 
-# --- OUR PATH FIX (Do not remove this!) ---
+# --- THE COMPLETE PATH FIX ---
+# 1. Find our exact locations on the cloud server
 CURRENT_DIR = Path(__file__).parent.resolve()
+REPO_ROOT = CURRENT_DIR.parent.parent.resolve()
+
+# 2. Tell Python to look in the current folder (so web_app can find gemini_extractor)
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
 
+# 3. Tell Python to look at the master root folder (so gemini_extractor can find src.core and src.models)
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+# Now all imports will work flawlessly!
 from gemini_extractor import GeminiExtractor
 
 
