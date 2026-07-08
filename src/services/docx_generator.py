@@ -39,7 +39,7 @@ class DocxGenerator:
         return f"{carrier_code}{str(flight_no).strip()}"
 
     def generate(self, data: TicketData, makkah_hotel: str = "", madinah_hotel: str = "", group_name: str = "") -> str:
-        logger.info("Starting DOCX generation with targeted cell injection...")
+        logger.info("Starting DOCX generation with custom file naming...")
         if not os.path.exists(self.template_path):
             raise FileNotFoundError(f"Template not found at {self.template_path}")
             
@@ -54,7 +54,6 @@ class DocxGenerator:
                 p.text = f"FLIGHT: {data.primary_carrier.upper()} – MEDINAH"
 
         # 2. Table 1: Passenger Totals & Group Name
-        # We use laser-targeted grid coordinates here (Row 2 in Python is technically the 3rd row visually)
         if len(doc.tables) > 0:
             table_pax = doc.tables[0]
             if len(table_pax.rows) > 2:
@@ -107,8 +106,20 @@ class DocxGenerator:
                         if "MAKKAH" in row_text and makkah_hotel and "Select a" not in makkah_hotel:
                             self._write_bold_centered_cell(row.cells[1], makkah_hotel)
 
-        # Ensure safe filename
-        safe_name = "".join([c for c in data.passenger_name if c.isalpha() or c.isspace()]).rstrip()
+        # --- UPGRADE: DYNAMIC FILE NAMING ---
+        # If a Group Name is typed, use it. Otherwise, fall back to Passenger Name.
+        if group_name and str(group_name).strip():
+            name_to_use = str(group_name).strip()
+        else:
+            name_to_use = data.passenger_name
+
+        # Ensure safe filename (isalnum allows letters AND numbers so "04A" doesn't get deleted)
+        safe_name = "".join([c for c in name_to_use if c.isalnum() or c.isspace()]).rstrip()
+        
+        # Fallback if someone types a group name made entirely of weird symbols
+        if not safe_name:
+            safe_name = "Travel"
+            
         filename = f"{safe_name.replace(' ', '_')}_Itinerary.docx"
         output_path = os.path.join(self.output_dir, filename)
         
