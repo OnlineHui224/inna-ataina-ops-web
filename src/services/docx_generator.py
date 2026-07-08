@@ -1,5 +1,5 @@
 from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH # Added to center the text
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 import os
 import re
 from src.models.data_schemas import TicketData
@@ -96,17 +96,27 @@ class DocxGenerator:
                     for row in table.rows:
                         row_text = row.cells[0].text.upper()
                         
-                        # FIXED: Looks for both MADINAH and MEDINAH
                         if ("MADINAH" in row_text or "MEDINAH" in row_text) and madinah_hotel and "Select a" not in madinah_hotel:
                             self._write_bold_centered_cell(row.cells[1], madinah_hotel)
                             
                         if "MAKKAH" in row_text and makkah_hotel and "Select a" not in makkah_hotel:
                             self._write_bold_centered_cell(row.cells[1], makkah_hotel)
                 
-                # Check if this is the Group Table
-                if "group" in table.rows[0].cells[0].text.lower():
-                    if len(table.rows) > 1 and group_name:
-                        self._write_bold_centered_cell(table.rows[1].cells[1], group_name)
+                # --- FIXED: SMART FINDER FOR GROUP NAME ---
+                for r_idx, row in enumerate(table.rows):
+                    header_col_idx = -1
+                    # Scan every cell in the row to find "Group Name"
+                    for c_idx, cell in enumerate(row.cells):
+                        if "group name" in cell.text.lower():
+                            header_col_idx = c_idx
+                            break
+                    
+                    # If we found the header, drop down exactly 1 row and write the text
+                    if header_col_idx != -1:
+                        target_row_idx = r_idx + 1
+                        if target_row_idx < len(table.rows) and group_name:
+                            self._write_bold_centered_cell(table.rows[target_row_idx].cells[header_col_idx], group_name)
+                        break # Stop searching once we've injected it
 
         # Ensure safe filename
         safe_name = "".join([c for c in data.passenger_name if c.isalpha() or c.isspace()]).rstrip()
