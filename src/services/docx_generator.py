@@ -39,7 +39,7 @@ class DocxGenerator:
         return f"{carrier_code}{str(flight_no).strip()}"
 
     def generate(self, data: TicketData, makkah_hotel: str = "", madinah_hotel: str = "", group_name: str = "") -> str:
-        logger.info("Starting DOCX generation with Hotel and Group upgrades...")
+        logger.info("Starting DOCX generation with targeted cell injection...")
         if not os.path.exists(self.template_path):
             raise FileNotFoundError(f"Template not found at {self.template_path}")
             
@@ -53,10 +53,16 @@ class DocxGenerator:
             if "FLIGHT:" in p.text and "MEDINAH" in p.text:
                 p.text = f"FLIGHT: {data.primary_carrier.upper()} – MEDINAH"
 
-        # 2. Table 1: Passenger Totals
+        # 2. Table 1: Passenger Totals & Group Name
+        # We use laser-targeted grid coordinates here (Row 2 in Python is technically the 3rd row visually)
         if len(doc.tables) > 0:
             table_pax = doc.tables[0]
             if len(table_pax.rows) > 2:
+                # Target Column 1 (Group Name)
+                if group_name:
+                    self._write_bold_centered_cell(table_pax.cell(2, 1), group_name)
+                    
+                # Target Columns 2, 3, and 4 (Adult, Child, Total)
                 self._safe_write_cell(table_pax.cell(2, 2), data.adults)   
                 self._safe_write_cell(table_pax.cell(2, 3), data.children)  
                 self._safe_write_cell(table_pax.cell(2, 4), data.total_pax) 
@@ -88,10 +94,9 @@ class DocxGenerator:
                 if idx == 0:
                     self._safe_write_cell(row.cells[7], data.pnr)
 
-        # --- UPGRADES 2 & 3: HOTEL & GROUP NAME INJECTION ---
+        # 4. Table 3: Hotel Accommodation
         for table in doc.tables:
             if len(table.rows) > 0:
-                # Check if this is the Hotel Table
                 if "city" in table.rows[1].cells[0].text.lower() if len(table.rows) > 1 else False:
                     for row in table.rows:
                         row_text = row.cells[0].text.upper()
@@ -101,22 +106,6 @@ class DocxGenerator:
                             
                         if "MAKKAH" in row_text and makkah_hotel and "Select a" not in makkah_hotel:
                             self._write_bold_centered_cell(row.cells[1], makkah_hotel)
-                
-                # --- FIXED: SMART FINDER FOR GROUP NAME ---
-                for r_idx, row in enumerate(table.rows):
-                    header_col_idx = -1
-                    # Scan every cell in the row to find "Group Name"
-                    for c_idx, cell in enumerate(row.cells):
-                        if "group name" in cell.text.lower():
-                            header_col_idx = c_idx
-                            break
-                    
-                    # If we found the header, drop down exactly 1 row and write the text
-                    if header_col_idx != -1:
-                        target_row_idx = r_idx + 1
-                        if target_row_idx < len(table.rows) and group_name:
-                            self._write_bold_centered_cell(table.rows[target_row_idx].cells[header_col_idx], group_name)
-                        break # Stop searching once we've injected it
 
         # Ensure safe filename
         safe_name = "".join([c for c in data.passenger_name if c.isalpha() or c.isspace()]).rstrip()
