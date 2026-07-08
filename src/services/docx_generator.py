@@ -1,5 +1,6 @@
 from docx import Document
 import os
+import re
 from src.models.data_schemas import TicketData
 from src.core.logger import logger
 
@@ -12,13 +13,27 @@ class DocxGenerator:
         """Writes text to a cell while attempting to preserve paragraph styles."""
         if not cell: return
         cell.text = str(text)
-        # Apply standard formatting if needed, though template defaults usually hold
         for paragraph in cell.paragraphs:
             for run in paragraph.runs:
-                run.font.name = 'Arial' # Standardizing based on observed template
+                run.font.name = 'Arial'
 
-    def generate(self, data: TicketData) -> str:
-        logger.info("Starting DOCX generation...")
+    def _format_flight_number(self, carrier: str, flight_no: str) -> str:
+        """Formats flight numbers to strictly be CARRIER + 4 DIGITS (e.g., QR0635)"""
+        carrier_code = str(carrier).strip().upper()
+        # Extract only the numbers in case the AI accidentally grabbed text
+        digits_only = re.sub(r'\D', '', str(flight_no))
+        
+        if digits_only:
+            # Pad with zeros to make it exactly 4 digits
+            padded_flight = digits_only.zfill(4)
+            return f"{carrier_code}{padded_flight}"
+        
+        # Fallback if no digits were found
+        return f"{carrier_code}{str(flight_no).strip()}"
+
+    # UPGRADE: Added hotel and group variables
+    def generate(self, data: TicketData, makkah_hotel: str = "", madinah_hotel: str = "", group_name: str = "") -> str:
+        logger.info("Starting DOCX generation with Hotel and Group upgrades...")
         if not os.path.exists(self.template_path):
             raise FileNotFoundError(f"Template not found at {self.template_path}")
             
@@ -35,20 +50,18 @@ class DocxGenerator:
         # 2. Table 1: Passenger Totals (Index 0)
         if len(doc.tables) > 0:
             table_pax = doc.tables[0]
-            # Assuming Row 2 contains the entry cells based on the blank template mapping
             if len(table_pax.rows) > 2:
                 self._safe_write_cell(table_pax.cell(2, 2), data.adults)    # Adult
                 self._safe_write_cell(table_pax.cell(2, 3), data.children)  # Child
                 self._safe_write_cell(table_pax.cell(2, 4), data.total_pax) # Total
 
-        # 3. Table 2: Flights (Index 1)
+        # 3. Table 2: Flights (Index 1) - WITH FLIGHT FORMATTING UPGRADE
         if len(doc.tables) > 1:
             table_flights = doc.tables[1]
-            start_row = 2 # Based on template header rows
+            start_row = 2 
             
             for idx, flight in enumerate(data.flights):
                 row_idx = start_row + idx
-                # If we exceed pre-built rows, add a new one
                 if row_idx >= len(table_flights.rows):
                     table_flights.add_row()
                 
@@ -56,18 +69,37 @@ class DocxGenerator:
                 self._safe_write_cell(row.cells[0], flight.departure_city)
                 self._safe_write_cell(row.cells[1], flight.arrival_city)
                 
-                # Handling the pre-existing "2026" string logic
                 date_str = f"{flight.date} 2026" if "2026" not in flight.date else flight.date
                 self._safe_write_cell(row.cells[2], date_str)
                 
                 self._safe_write_cell(row.cells[3], flight.departure_time)
                 self._safe_write_cell(row.cells[4], flight.arrival_time)
                 self._safe_write_cell(row.cells[5], flight.carrier)
-                self._safe_write_cell(row.cells[6], flight.flight_number)
                 
-                # Only write PNR on the first row to avoid clutter, or write on all
+                # --- UPGRADE 1: INJECTING PERFECT FLIGHT NUMBER ---
+                perfect_flight_no = self._format_flight_number(flight.carrier, flight.flight_number)
+                self._safe_write_cell(row.cells[6], perfect_flight_no)
+                
                 if idx == 0:
                     self._safe_write_cell(row.cells[7], data.pnr)
+
+        # --- UPGRADES 2 & 3: HOTEL & GROUP NAME INJECTION ---
+        for table in doc.tables:
+            if len(table.rows) > 0:
+                # Check if this is the Hotel Table
+                if "city" in table.rows[1].cells[0].text.lower() if len(table.rows) > 1 else False:
+                    # Look for Madinah and Makkah rows to inject the hotels safely
+                    for row in table.rows:
+                        if "MADINAH" in row.cells[0].text.upper() and madinah_hotel and madinah_hotel != "Select a hotel...":
+                            self._safe_write_cell(row.cells[1], madinah_hotel)
+                        if "MAKKAH" in row.cells[0].text.upper() and makkah_hotel and makkah_hotel != "Select a hotel...":
+                            self._safe_write_cell(row.cells[1], makkah_hotel)
+                
+                # Check if this is the Group Table
+                if "group" in table.rows[0].cells[0].text.lower():
+                    if len(table.rows) > 1 and group_name:
+                        # Write the group name into the second column (Index 1) of the blank row
+                        self._safe_write_cell(table.rows[1].cells[1], group_name)
 
         # Ensure safe filename
         safe_name = "".join([c for c in data.passenger_name if c.isalpha() or c.isspace()]).rstrip()
