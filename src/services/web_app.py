@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import tempfile
 import streamlit as st
+import pandas as pd # NEW: For reading Excel
 
 # --- THE COMPLETE PATH FIX ---
 CURRENT_DIR = Path(__file__).parent.resolve()
@@ -15,7 +16,6 @@ if str(REPO_ROOT) not in sys.path:
 
 from gemini_extractor import GeminiExtractor
 
-# --- IMPORTING YOUR EXACT DOCX GENERATOR ---
 try:
     from docx_generator import DocxGenerator
     DOCX_ERROR = None
@@ -23,7 +23,6 @@ except Exception as e:
     DocxGenerator = None
     DOCX_ERROR = str(e)
 
-# --- API KEY FUNCTION ---
 def _get_gemini_api_key() -> str:
     try:
         if "GEMINI_API_KEY" in st.secrets and st.secrets["GEMINI_API_KEY"]:
@@ -32,9 +31,21 @@ def _get_gemini_api_key() -> str:
         pass
     return (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
 
+# --- UPGRADE: EXCEL HOTEL DATABASE CACHE ---
+@st.cache_data
+def load_hotel_database():
+    try:
+        excel_path = os.path.join(str(REPO_ROOT), "assets", "hotels.xlsx")
+        # Ensure it reads your specific file. Assuming column is named 'Hotel Name' or just taking the first column.
+        df = pd.read_excel(excel_path)
+        # Grab the first column's data, remove empty slots, and turn it into a list
+        hotel_list = df.iloc[:, 0].dropna().unique().tolist()
+        return ["Select a hotel..."] + hotel_list
+    except Exception as e:
+        return ["Select a hotel...", "Error: Could not load hotels.xlsx"]
 
 # --- 1. PAGE SETUP & MEMORY ---
-st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="centered")
+st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="wide") # Changed to wide for a better CRM look
 
 if "extracted_data" not in st.session_state:
     st.session_state.extracted_data = None
@@ -55,7 +66,6 @@ st.divider()
 
 uploaded_file = st.file_uploader("Upload Travel Ticket (PDF, JPG, PNG)", type=["pdf", "jpg", "jpeg", "png"])
 
-# --- BUTTON 1: EXTRACT DATA ---
 if st.button("1. Extract Ticket Data", type="primary"):
     if uploaded_file is not None:
         with st.spinner("AI is reading the ticket... Please wait."):
@@ -76,11 +86,9 @@ if st.button("1. Extract Ticket Data", type="primary"):
                 
                 if extracted_data is None:
                     st.error("Extraction failed. The AI returned an empty response.")
-                    st.code(getattr(extractor, "last_error", "Unknown Error"))
                 else:
                     st.success("Extraction 100% Successful!")
                     st.session_state.extracted_data = extracted_data
-                    st.json(extracted_data.model_dump()) 
                 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
@@ -91,12 +99,34 @@ if st.button("1. Extract Ticket Data", type="primary"):
     else:
         st.warning("Please upload a ticket first!")
 
-
-# --- BUTTON 2: GENERATE DOCUMENT ---
+# --- UPGRADE: THE NEW OPERATIONS CRM DASHBOARD ---
 if st.session_state.extracted_data is not None:
     st.divider()
-    st.success("✅ Ticket data saved in memory! Ready to generate document.")
+    st.subheader("📝 Step 2: Finalize Document Details")
     
+    # Load hotels from your Excel file
+    hotel_options = load_hotel_database()
+    
+    # Create a nice 3-column layout
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.info("👥 Client Info")
+        group_name_input = st.text_input("Group Name (Optional)", placeholder="Type group name here...")
+        
+    with col2:
+        st.warning("🕋 Makkah Accommodation")
+        makkah_hotel_input = st.selectbox("Select Makkah Hotel", options=hotel_options)
+        
+    with col3:
+        st.success("🕌 Madinah Accommodation")
+        madinah_hotel_input = st.selectbox("Select Madinah Hotel", options=hotel_options)
+
+    # Show a preview of the aviation data below
+    with st.expander("🔍 View Raw Flight Data"):
+        st.json(st.session_state.extracted_data.model_dump()) 
+
+    # --- BUTTON 2: GENERATE DOCUMENT IN SIDEBAR ---
     with st.sidebar:
         if st.button("2. Generate Document", type="primary"):
             if DocxGenerator is None:
@@ -104,13 +134,18 @@ if st.session_state.extracted_data is not None:
             else:
                 with st.spinner("Generating Word Document..."):
                     try:
-                        # --- UPDATED: EXACT TEMPLATE NAME ---
                         template_path = os.path.join(str(REPO_ROOT), "assets", "blank_template.docx")
                         output_dir = os.path.join(str(REPO_ROOT), "output")
                         
                         generator = DocxGenerator(template_path=template_path, output_dir=output_dir)
                         
-                        doc_file_path = generator.generate(st.session_state.extracted_data)
+                        # UPGRADE: Send the new inputs to the document generator
+                        doc_file_path = generator.generate(
+                            data=st.session_state.extracted_data,
+                            makkah_hotel=makkah_hotel_input,
+                            madinah_hotel=madinah_hotel_input,
+                            group_name=group_name_input
+                        )
                         
                         final_file_name = os.path.basename(doc_file_path)
                         
