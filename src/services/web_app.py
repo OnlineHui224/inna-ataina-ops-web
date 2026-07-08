@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 import tempfile
 import streamlit as st
-import pandas as pd # NEW: For reading Excel
+import pandas as pd 
 
 # --- THE COMPLETE PATH FIX ---
 CURRENT_DIR = Path(__file__).parent.resolve()
@@ -31,21 +31,58 @@ def _get_gemini_api_key() -> str:
         pass
     return (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
 
-# --- UPGRADE: EXCEL HOTEL DATABASE CACHE ---
+
+# --- SMART EXCEL FILTER (MATCHES YOUR SCREENSHOT EXACTLY) ---
 @st.cache_data
 def load_hotel_database():
+    excel_path = os.path.join(str(REPO_ROOT), "assets", "hotels.xlsx")
+    
+    default_makkah = ["Select a Makkah hotel..."]
+    default_madinah = ["Select a Madinah hotel..."]
+    
+    if not os.path.exists(excel_path):
+        return default_makkah + ["⚠️ Missing assets/hotels.xlsx file"], default_madinah + ["⚠️ Missing assets/hotels.xlsx file"]
+        
     try:
-        excel_path = os.path.join(str(REPO_ROOT), "assets", "hotels.xlsx")
-        # Ensure it reads your specific file. Assuming column is named 'Hotel Name' or just taking the first column.
+        # Read the Excel sheet
         df = pd.read_excel(excel_path)
-        # Grab the first column's data, remove empty slots, and turn it into a list
-        hotel_list = df.iloc[:, 0].dropna().unique().tolist()
-        return ["Select a hotel..."] + hotel_list
+        
+        if df.empty:
+            return default_makkah + ["⚠️ Excel sheet is empty"], default_madinah + ["⚠️ Excel sheet is empty"]
+            
+        # Standardize column names so it doesn't crash if there's an extra space
+        cols = df.columns.astype(str).str.strip().str.lower()
+        df.columns = cols
+        
+        # Dynamically find the "English Name" column and the "City" column
+        hotel_col = next((c for c in cols if 'english' in c or 'hotel name' in c), cols[1] if len(cols) > 1 else cols[0])
+        city_col = next((c for c in cols if 'city' in c), cols[3] if len(cols) > 3 else cols[-1])
+        
+        # Clean the data
+        df[hotel_col] = df[hotel_col].astype(str).str.strip()
+        df[city_col] = df[city_col].astype(str).str.strip().str.lower()
+        
+        # 1. Grab all Makkah Hotels
+        makkah_mask = df[city_col].str.contains('makkah|mecca', na=False)
+        makkah_list = df[makkah_mask][hotel_col].unique().tolist()
+        makkah_list = [h for h in makkah_list if h.lower() != 'nan' and h != '']
+        makkah_list.sort()
+        
+        # 2. Grab all Madinah Hotels (handles "Madina" like in your screenshot)
+        madinah_mask = df[city_col].str.contains('madina|medina', na=False)
+        madinah_list = df[madinah_mask][hotel_col].unique().tolist()
+        madinah_list = [h for h in madinah_list if h.lower() != 'nan' and h != '']
+        madinah_list.sort()
+        
+        return default_makkah + makkah_list, default_madinah + madinah_list
+        
     except Exception as e:
-        return ["Select a hotel...", "Error: Could not load hotels.xlsx"]
+        error_msg = f"⚠️ Excel Error: {str(e)}"
+        return default_makkah + [error_msg], default_madinah + [error_msg]
+
 
 # --- 1. PAGE SETUP & MEMORY ---
-st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="wide") # Changed to wide for a better CRM look
+st.set_page_config(page_title="INNA ATAINA OPS PRO", page_icon="✈️", layout="wide") 
 
 if "extracted_data" not in st.session_state:
     st.session_state.extracted_data = None
@@ -99,15 +136,14 @@ if st.button("1. Extract Ticket Data", type="primary"):
     else:
         st.warning("Please upload a ticket first!")
 
-# --- UPGRADE: THE NEW OPERATIONS CRM DASHBOARD ---
+
 if st.session_state.extracted_data is not None:
     st.divider()
     st.subheader("📝 Step 2: Finalize Document Details")
     
-    # Load hotels from your Excel file
-    hotel_options = load_hotel_database()
+    # Run the smart filter!
+    makkah_options, madinah_options = load_hotel_database()
     
-    # Create a nice 3-column layout
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -116,17 +152,15 @@ if st.session_state.extracted_data is not None:
         
     with col2:
         st.warning("🕋 Makkah Accommodation")
-        makkah_hotel_input = st.selectbox("Select Makkah Hotel", options=hotel_options)
+        makkah_hotel_input = st.selectbox("Select Makkah Hotel", options=makkah_options)
         
     with col3:
         st.success("🕌 Madinah Accommodation")
-        madinah_hotel_input = st.selectbox("Select Madinah Hotel", options=hotel_options)
+        madinah_hotel_input = st.selectbox("Select Madinah Hotel", options=madinah_options)
 
-    # Show a preview of the aviation data below
     with st.expander("🔍 View Raw Flight Data"):
         st.json(st.session_state.extracted_data.model_dump()) 
 
-    # --- BUTTON 2: GENERATE DOCUMENT IN SIDEBAR ---
     with st.sidebar:
         if st.button("2. Generate Document", type="primary"):
             if DocxGenerator is None:
@@ -139,11 +173,13 @@ if st.session_state.extracted_data is not None:
                         
                         generator = DocxGenerator(template_path=template_path, output_dir=output_dir)
                         
-                        # UPGRADE: Send the new inputs to the document generator
+                        makkah_val = "" if "Select a Makkah" in makkah_hotel_input or "⚠️" in makkah_hotel_input else makkah_hotel_input
+                        madinah_val = "" if "Select a Madinah" in madinah_hotel_input or "⚠️" in madinah_hotel_input else madinah_hotel_input
+                        
                         doc_file_path = generator.generate(
                             data=st.session_state.extracted_data,
-                            makkah_hotel=makkah_hotel_input,
-                            madinah_hotel=madinah_hotel_input,
+                            makkah_hotel=makkah_val,
+                            madinah_hotel=madinah_val,
                             group_name=group_name_input
                         )
                         
