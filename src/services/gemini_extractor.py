@@ -1,6 +1,5 @@
 import os
 import json
-import tempfile
 from typing import Any, Dict, List
 import google.generativeai as genai
 from pydantic import ValidationError
@@ -10,7 +9,6 @@ from src.models.data_schemas import TicketData
 
 class GeminiExtractor:
     def __init__(self, api_key: str):
-        # 1. Clean the API key of any accidental hidden spaces or quotes
         self.api_key = api_key.strip() if api_key else ""
         self.last_error = ""
         
@@ -18,10 +16,8 @@ class GeminiExtractor:
             logger.error("No API key provided to GeminiExtractor.")
             raise ValueError("Gemini API key is missing.")
 
-        # 2. CRITICAL FIX: Explicitly configure the API key right here.
+        # Configure the generative AI framework with your key
         genai.configure(api_key=self.api_key)
-        
-        # 3. Initialize the generative model
         self.model = genai.GenerativeModel('gemini-2.5-flash')
 
     @staticmethod
@@ -91,37 +87,31 @@ class GeminiExtractor:
             raise ValueError(f"Gemini returned invalid JSON: {exc}") from exc
 
     def extract(self, uploaded_files) -> TicketData:
-        """Handles MULTIPLE Streamlit UploadedFile objects at once."""
-        logger.info(f"Starting AI extraction for {len(uploaded_files)} file(s)...")
+        """Handles MULTIPLE uploaded files by passing raw content directly inline."""
+        logger.info(f"Starting direct contents extraction for {len(uploaded_files)} file(s)...")
         
-        gemini_uploaded_files = []
-        temp_file_paths = []
+        contents = [self._build_prompt()]
 
         try:
-            # 1. Loop through every file the user uploaded
+            # Loop through files and convert them to direct binary data parts for the model
             for uploaded_file in uploaded_files:
-                # Save each file temporarily so Gemini can read it natively
-                suffix = os.path.splitext(uploaded_file.name)[1].lower()
-                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-                    temp_file.write(uploaded_file.getvalue())
-                    temp_file_paths.append(temp_file.name)
+                file_bytes = uploaded_file.getvalue()
+                mime_type = uploaded_file.type  # Automatically detects application/pdf, image/png, etc.
                 
-                # Upload each file directly to Google's AI servers
-                gemini_file = genai.upload_file(path=temp_file_paths[-1])
-                gemini_uploaded_files.append(gemini_file)
+                contents.append({
+                    "mime_type": mime_type,
+                    "data": file_bytes
+                })
 
-            # 2. Tell the AI to merge everything (Prompt + List of Files)
-            content_to_send = [self._build_prompt()] + gemini_uploaded_files
-            
             generation_config = genai.GenerationConfig(
                 temperature=0.0,
                 response_mime_type="application/json",
                 response_schema=self._ticket_data_response_schema(),
             )
 
-            # 3. Call the Model
+            # Send everything inline—bypassing the Cloud File Manager permission checks entirely
             response = self.model.generate_content(
-                content_to_send,
+                contents,
                 generation_config=generation_config
             )
 
@@ -129,27 +119,15 @@ class GeminiExtractor:
             if not raw_text:
                 raise ValueError("Gemini returned an empty response. The tickets might be unreadable.")
 
-            # 4. Parse and Validate
             raw_data = self._safe_json_loads(raw_text)
             validated_data = TicketData(**raw_data)
 
-            logger.info("Successfully extracted and merged multi-file data.")
+            logger.info("Successfully extracted multi-file data via inline stream.")
             return validated_data
 
         except ValidationError as exc:
             logger.error("Pydantic validation failed: %s", exc)
             raise ValueError(f"Extracted data failed schema validation: {exc}") from exc
         except Exception as exc:
-            logger.error("Extraction failed: %s", exc)
+            logger.error("Direct inline extraction failed: %s", exc)
             raise
-        finally:
-            # 5. Clean up: Delete temporary files so your server stays clean
-            for path in temp_file_paths:
-                if os.path.exists(path):
-                    os.remove(path)
-            # Clean up Google Cloud memory
-            for g_file in gemini_uploaded_files:
-                try:
-                    genai.delete_file(g_file.name)
-                except:
-                    pass
