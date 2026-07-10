@@ -1,7 +1,8 @@
 import os
 import json
-from typing import Any, Dict, List
-import google.generativeai as genai
+import base64
+import requests
+from typing import Any, Dict
 from pydantic import ValidationError
 
 from src.core.logger import logger
@@ -10,52 +11,47 @@ from src.models.data_schemas import TicketData
 class GeminiExtractor:
     def __init__(self, api_key: str):
         self.api_key = api_key.strip() if api_key else ""
-        self.last_error = ""
         
         if not self.api_key:
-            logger.error("No API key provided to GeminiExtractor.")
+            logger.error("No API key provided.")
             raise ValueError("Gemini API key is missing.")
-
-        # Configure the generative AI framework with your key
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
 
     @staticmethod
     def _ticket_data_response_schema() -> Dict[str, Any]:
-        """Gemini response schema aligned with TicketData/FlightSegment."""
+        """Strict OpenAPI Schema for the raw REST API."""
         return {
-            "type": "object",
+            "type": "OBJECT",
             "properties": {
-                "passenger_name": {"type": "string"},
-                "adults": {"type": "integer"},
-                "children": {"type": "integer"},
-                "pnr": {"type": "string"},
-                "primary_carrier": {"type": "string"},
+                "passenger_name": {"type": "STRING"},
+                "adults": {"type": "INTEGER"},
+                "children": {"type": "INTEGER"},
+                "pnr": {"type": "STRING"},
+                "primary_carrier": {"type": "STRING"},
                 "flights": {
-                    "type": "array",
+                    "type": "ARRAY",
                     "items": {
-                        "type": "object",
+                        "type": "OBJECT",
                         "properties": {
-                            "departure_city": {"type": "string"},
-                            "arrival_city": {"type": "string"},
-                            "date": {"type": "string"},
-                            "departure_time": {"type": "string"},
-                            "arrival_time": {"type": "string"},
-                            "carrier": {"type": "string"},
-                            "flight_number": {"type": "string"},
+                            "departure_city": {"type": "STRING"},
+                            "arrival_city": {"type": "STRING"},
+                            "date": {"type": "STRING"},
+                            "departure_time": {"type": "STRING"},
+                            "arrival_time": {"type": "STRING"},
+                            "carrier": {"type": "STRING"},
+                            "flight_number": {"type": "STRING"},
                         },
                         "required": [
                             "departure_city", "arrival_city", "date", 
                             "departure_time", "arrival_time", "carrier", "flight_number"
-                        ],
-                    },
+                        ]
+                    }
                 },
-                "ai_confidence": {"type": "number"},
+                "ai_confidence": {"type": "NUMBER"}
             },
             "required": [
                 "passenger_name", "adults", "children", "pnr", 
                 "primary_carrier", "flights", "ai_confidence"
-            ],
+            ]
         }
 
     @staticmethod
@@ -69,65 +65,73 @@ class GeminiExtractor:
             "2) Extract EVERY flight leg from ALL files and keep flights in chronological order.\n"
             "3) Use exact field names from schema, do not add unknown keys.\n"
             "4) Date format: 'DD MMM' (e.g., '23 JUL') when available.\n"
-            "5) Convert all airline carrier names into standard 2-letter IATA airline codes (e.g., TK for Turkish Airlines, SV for Saudia, ET for Ethiopian Airlines).\n"
-            "6) Convert all departure and arrival cities/countries into their official 3-letter IATA airport codes (e.g., LOS for Lagos, DOH for Doha, ABV for Abuja, MED for Madinah, JED for Jeddah).\n"
+            "5) Convert all airline carrier names into standard 2-letter IATA airline codes.\n"
+            "6) Convert all departure and arrival cities/countries into their official 3-letter IATA airport codes.\n"
         )
 
-    @staticmethod
-    def _safe_json_loads(raw_text: str) -> Dict[str, Any]:
-        """Safely parse JSON text. Handles occasional markdown fences defensively."""
-        text = (raw_text or "").strip()
-        if text.startswith("```"):
-            text = text.strip("`")
-            if text.lower().startswith("json"):
-                text = text[4:].strip()
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"Gemini returned invalid JSON: {exc}") from exc
-
     def extract(self, uploaded_files) -> TicketData:
-        """Handles MULTIPLE uploaded files by passing raw content directly inline."""
-        logger.info(f"Starting direct contents extraction for {len(uploaded_files)} file(s)...")
+        """Bypasses the deprecated library and connects directly to Google's REST API."""
+        logger.info(f"Starting direct REST API extraction for {len(uploaded_files)} file(s)...")
         
-        contents = [self._build_prompt()]
+        parts = [{"text": self._build_prompt()}]
 
         try:
-            # Loop through files and convert them to direct binary data parts for the model
+            # 1. Convert all uploaded files into raw binary data
             for uploaded_file in uploaded_files:
                 file_bytes = uploaded_file.getvalue()
-                mime_type = uploaded_file.type  # Automatically detects application/pdf, image/png, etc.
-                
-                contents.append({
-                    "mime_type": mime_type,
-                    "data": file_bytes
+                mime_type = uploaded_file.type
+                b64_data = base64.b64encode(file_bytes).decode("utf-8")
+                parts.append({
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": b64_data
+                    }
                 })
 
-            generation_config = genai.GenerationConfig(
-                temperature=0.0,
-                response_mime_type="application/json",
-                response_schema=self._ticket_data_response_schema(),
-            )
+            # 2. Package the exact payload Google expects
+            payload = {
+                "contents": [{"parts": parts}],
+                "generationConfig": {
+                    "temperature": 0.0,
+                    "responseMimeType": "application/json",
+                    "responseSchema": self._ticket_data_response_schema()
+                }
+            }
 
-            # Send everything inline—bypassing the Cloud File Manager permission checks entirely
-            response = self.model.generate_content(
-                contents,
-                generation_config=generation_config
-            )
-
-            raw_text = getattr(response, "text", "") or ""
+            # 3. Talk directly to the Gemini 2.5 Flash Server
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
+            
+            response = requests.post(url, json=payload)
+            response.raise_for_status() # Catch any server errors immediately
+            
+            data = response.json()
+            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+            
             if not raw_text:
-                raise ValueError("Gemini returned an empty response. The tickets might be unreadable.")
+                raise ValueError("Gemini returned an empty response.")
 
-            raw_data = self._safe_json_loads(raw_text)
-            validated_data = TicketData(**raw_data)
+            # 4. Clean up any markdown blocks and parse the JSON
+            text = raw_text.strip()
+            if text.startswith("```"):
+                text = text.strip("`")
+                if text.lower().startswith("json"):
+                    text = text[4:].strip()
 
-            logger.info("Successfully extracted multi-file data via inline stream.")
+            raw_json = json.loads(text)
+            validated_data = TicketData(**raw_json)
+
+            logger.info("Successfully extracted multi-file data via REST.")
             return validated_data
 
+        except requests.exceptions.RequestException as exc:
+            err_msg = str(exc)
+            if exc.response is not None:
+                err_msg += f" Response: {exc.response.text}"
+            logger.error("REST API extraction failed: %s", err_msg)
+            raise ValueError(f"API Request failed: {err_msg}") from exc
         except ValidationError as exc:
             logger.error("Pydantic validation failed: %s", exc)
             raise ValueError(f"Extracted data failed schema validation: {exc}") from exc
         except Exception as exc:
-            logger.error("Direct inline extraction failed: %s", exc)
+            logger.error("Extraction failed: %s", exc)
             raise
