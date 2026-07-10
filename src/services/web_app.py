@@ -32,7 +32,7 @@ def _get_gemini_api_key() -> str:
     return (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
 
 
-# --- SMART EXCEL FILTER (MATCHES YOUR SCREENSHOT EXACTLY) ---
+# --- SMART EXCEL FILTER ---
 @st.cache_data
 def load_hotel_database():
     excel_path = os.path.join(str(REPO_ROOT), "assets", "hotels.xlsx")
@@ -68,7 +68,7 @@ def load_hotel_database():
         makkah_list = [h for h in makkah_list if h.lower() != 'nan' and h != '']
         makkah_list.sort()
         
-        # 2. Grab all Madinah Hotels (handles "Madina" like in your screenshot)
+        # 2. Grab all Madinah Hotels
         madinah_mask = df[city_col].str.contains('madina|medina', na=False)
         madinah_list = df[madinah_mask][hotel_col].unique().tolist()
         madinah_list = [h for h in madinah_list if h.lower() != 'nan' and h != '']
@@ -102,7 +102,6 @@ st.markdown("**Developed by AIO Scholarworks**")
 st.divider()
 
 # --- UPGRADED MULTI-FILE UPLOADER ---
-# Notice we added accept_multiple_files=True
 uploaded_files = st.file_uploader(
     "Upload Travel Tickets (PDF, JPG, PNG)", 
     type=["pdf", "jpg", "png"], 
@@ -110,46 +109,31 @@ uploaded_files = st.file_uploader(
 )
 
 if st.button("1. Extract Ticket Data"):
-    # Check if the list has at least one file in it
     if uploaded_files and len(uploaded_files) > 0:
-        with st.spinner(f" OPS PRO is reading {len(uploaded_files)} file(s)... Please wait."):
+        with st.spinner(f"OPS PRO is reading {len(uploaded_files)} file(s)... Please wait."):
             try:
-                # Pass the ENTIRE list of files to the extractor at once
-                st.session_state.ticket_data = extractor.extract(uploaded_files)
-                st.success("Extraction successful! Review the data below.")
-            except Exception as e:
-                st.error(f"Extraction failed: {str(e)}")
-    else:
-        st.warning("Please upload at least one ticket before extracting.")
-            
-            file_extension = os.path.splitext(uploaded_file.name)[1]
-            with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp_file:
-                tmp_file.write(uploaded_file.getvalue())
-                tmp_path = tmp_file.name
-
-            try:
+                # 1. Grab API Key
                 api_key = _get_gemini_api_key()
                 if not api_key:
                     st.error("GEMINI_API_KEY is not configured.")
                     st.stop()
 
+                # 2. Initialize the multi-file extractor
                 extractor = GeminiExtractor(api_key)
-                extracted_data = extractor.process_document(tmp_path)
+                
+                # 3. Pass the ENTIRE list of files to the extractor at once
+                extracted_data = extractor.extract(uploaded_files)
                 
                 if extracted_data is None:
                     st.error("Extraction failed. The AI returned an empty response.")
                 else:
                     st.success("Extraction 100% Successful!")
                     st.session_state.extracted_data = extracted_data
-                
+                    
             except Exception as e:
-                st.error(f"An error occurred: {e}")
-                
-            finally:
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
+                st.error(f"Extraction failed: {str(e)}")
     else:
-        st.warning("Please upload a ticket first!")
+        st.warning("Please upload at least one ticket before extracting.")
 
 
 if st.session_state.extracted_data is not None:
