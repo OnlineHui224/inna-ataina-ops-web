@@ -89,23 +89,38 @@ if "extracted_data" not in st.session_state:
 
 
 # --- 2. SIDEBAR DESIGN ---
-st.sidebar.title("✈️ INNA ATAINA TRAVELS")
+st.sidebar.title("✈️ INNA ATAINA TRAVELS ✈️")
 st.sidebar.markdown("### OPS PRO")
 st.sidebar.divider()
 st.sidebar.info("Step 1: Upload and extract the ticket data on the main screen.\n\nStep 2: Generate the document here.")
 
 
 # --- 3. MAIN PAGE UI ---
-st.title("✈️ INNA ATAINA TRAVELS")
-st.subheader("Operations Automation Pro")
+st.title("✈️ INNA ATAINA TRAVELS ✈️")
+st.subheader("Operations Automation Pro (OPS PRO)")
 st.markdown("**Developed by AIO Scholarworks**")
 st.divider()
 
-uploaded_file = st.file_uploader("Upload Travel Ticket (PDF, JPG, PNG)", type=["pdf", "jpg", "jpeg", "png"])
+# --- UPGRADED MULTI-FILE UPLOADER ---
+# Notice we added accept_multiple_files=True
+uploaded_files = st.file_uploader(
+    "Upload Travel Tickets (PDF, JPG, PNG)", 
+    type=["pdf", "jpg", "png"], 
+    accept_multiple_files=True 
+)
 
-if st.button("1. Extract Ticket Data", type="primary"):
-    if uploaded_file is not None:
-        with st.spinner("AI is reading the ticket... Please wait."):
+if st.button("1. Extract Ticket Data"):
+    # Check if the list has at least one file in it
+    if uploaded_files and len(uploaded_files) > 0:
+        with st.spinner(f" OPS PRO is reading {len(uploaded_files)} file(s)... Please wait."):
+            try:
+                # Pass the ENTIRE list of files to the extractor at once
+                st.session_state.ticket_data = extractor.extract(uploaded_files)
+                st.success("Extraction successful! Review the data below.")
+            except Exception as e:
+                st.error(f"Extraction failed: {str(e)}")
+    else:
+        st.warning("Please upload at least one ticket before extracting.")
             
             file_extension = os.path.splitext(uploaded_file.name)[1]
             with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp_file:
