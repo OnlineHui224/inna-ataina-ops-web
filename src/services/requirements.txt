@@ -6,4 +6,4 @@ Pillow
 python-docx
 pandas
 openpyxl
-st-gsheets
+st-gsheets-connection
