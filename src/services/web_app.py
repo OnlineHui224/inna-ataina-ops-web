@@ -74,7 +74,7 @@ st.divider()
 # ==========================================
 # THE TAB SYSTEM (MODULES SEPARATED)
 # ==========================================
-tab_flights, tab_visas = st.tabs(["🎫 Flight Document Generator", "🛂 Visa & Logistics Logger"])
+tab_flights, tab_visas = st.tabs(["🎫 FLIGHT DOCUMENT OPS PRO", "🛂 VISA & CONTRACT LOGGER OP"])
 
 # ------------------------------------------
 # TAB 1: FLIGHTS (Your original setup)
