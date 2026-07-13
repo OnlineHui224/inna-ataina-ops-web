@@ -144,14 +144,14 @@ with tab_visas:
         "Soaif Travel", "Mukareem", "AL-Lagusyy", "Al-Wafah", "Travel nest", 
         "AT-Tibyan", "AL-Haqq", "AL-Bushrah", "AL-Shambagy", "Portfolio (Musty)", 
         "AL-furqan", "Baseeroh", "Alh-Adua agba", "Nurul-qulub", "Nokbah", 
-        "Al-Jannah Travels", "Voyagemistry", "Umrah UK", "Other (Manual Entry)"
+        "Al-Jannah Travels", "Voyagemistry", "Umrah UK", "Saheed", "WakaNow", "Chiroma", "Other (Manual Entry)"
     ]
     TRANSPORT_LIST = [
         "Select Transport...", "Full Airport Transportation", "Half Airport Transportation", 
         "Full Route Transportation", "Other (Manual Entry)"
     ]
     VISA_COMPANY_LIST = [
-        "Select Visa Company...", "Aydh", "Roya", "Makareem", "Arkan", 
+        "Select Visa Company...", "Aydh", "Roya", "Makareem", "LYN Contract", "Emaar", "Al-Mashaar",
         "Lamar", "Chiroma", "Ahali", "Other (Manual Entry)"
     ]
     
