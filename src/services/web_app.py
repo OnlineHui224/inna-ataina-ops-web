@@ -130,15 +130,20 @@ with tab_flights:
                         st.error(f"Failed: {e}")
 
 # ------------------------------------------
-# TAB 2: VISAS & LOGISTICS (The New Excel Tool)
-# ------------------------------------------
-# ------------------------------------------
-# TAB 2: VISAS & LOGISTICS (The New Excel Tool)
+# TAB 2: VISAS & LOGISTICS (The New Cloud Tool)
 # ------------------------------------------
 with tab_visas:
-    st.markdown("### Master Excel Database Logger")
-    st.info("Extract visa details and log the full package directly to the Master Excel File.")
+    st.markdown("### Master Cloud Database Logger")
+    st.info("Extract visa details and log the full package directly to your live Google Sheet.")
     
+    # Cloud URL Input
+    st.markdown("#### Cloud Configuration")
+    gsheet_url = st.text_input(
+        "Paste your Live Google Sheet Link here:", 
+        placeholder="https://docs.google.com/spreadsheets/d/..."
+    )
+    st.divider()
+
     AGENT_LIST = [
         "Select Agent...", "Inna-Ataina", "AshTag", "Al-Mubarak", "Seriki Group", 
         "Soaif Travel", "Mukareem", "AL-Lagusyy", "Al-Wafah", "Travel nest", 
@@ -175,7 +180,7 @@ with tab_visas:
         final_makkah = st.text_input("Type Makkah Hotel:") if sel_makkah == "Other (Manual Entry)" else sel_makkah
         
         sel_madinah = st.selectbox("Madinah Hotel (Visa Log)", options=madinah_options, key="v_mad")
-        final_madinah = st.text_input("Type Madinah Hotel:") if sel_madinah == "Other (Manual Entry)" else sel_madinah
+        final_madinah = st.text_input("Type Madinah Hotel:") if sel_madinah == "Other (Manual Sheet)" else sel_madinah
         
     col_dep, col_arr = st.columns(2)
     with col_dep:
@@ -186,15 +191,17 @@ with tab_visas:
     st.divider()
     visa_file = st.file_uploader("Upload Visa Document (PDF/Image)", type=["pdf", "jpg", "png"], key="visa_up")
     
-    if st.button("🚀 Extract Visa & Log to Excel", type="primary"):
+    if st.button("🚀 Extract Visa & Sync to Cloud", type="primary"):
         if visa_file is None:
             st.error("Upload a Visa document first!")
         elif "Select" in final_agent or "Select" in final_transport or "Select" in final_visa_comp:
             st.warning("Please fully select or type Agent, Transport, and Visa Company.")
         elif not final_agent or not final_transport or not final_visa_comp:
             st.warning("Manual entry fields cannot be empty!")
+        elif not gsheet_url or "spreadsheets/d" not in gsheet_url:
+            st.error("Please paste your valid Google Sheet URL at the top!")
         else:
-            with st.spinner("Extracting Visa Data & Updating Excel..."):
+            with st.spinner("Extracting Visa Data & Syncing to Google Sheets..."):
                 try:
                     api_key = _get_gemini_api_key()
                     v_extractor = VisaExtractor(api_key)
@@ -215,10 +222,14 @@ with tab_visas:
                         "VISA COMPANY": final_visa_comp
                     }
                     
-                    file_path = db_logger.log_visa(full_log_data)
-                    st.success(f"✅ Successfully logged **{visa_data.get('NAME')}** to Excel!")
+                    # Log directly to Google Sheets!
+                    df_updated = db_logger.log_visa(full_log_data, sheet_url=gsheet_url)
+                    st.success(f"✅ Successfully synced **{visa_data.get('NAME')}** to the Master Database!")
                     
-                    with open(file_path, "rb") as f:
-                        st.download_button("📥 Download Updated Excel Database", data=f, file_name="contract_visas_documentation.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    # Display a quick preview on the screen
+                    st.markdown("#### Cloud Database Preview (Last 5 Entries)")
+                    st.dataframe(df_updated.tail(5))
+                    
                 except Exception as e:
+                    st.error(f"Cloud syncing failed: {e}")
                     st.error(f"Failed to log data: {e}")
