@@ -136,9 +136,28 @@ with tab_visas:
     st.markdown("### Master Excel Database Logger")
     st.info("Extract visa details and log the full package directly to the Master Excel File.")
     
-    AGENT_LIST = ["Select Agent...", "Ginger Travelz", "Agent B", "Agent C"]
-    TRANSPORT_LIST = ["Select Transport...", "Standard Bus", "VIP GMC", "Private Car", "Train"]
-    VISA_COMPANY_LIST = ["Select Visa Company...", "Company A", "Company B", "Company C"]
+   # 1. Your Real-World Dropdown Lists
+    AGENT_LIST = [
+        "Select Agent...", 
+        "Inna-Ataina", "AshTag", "Al-Mubarak", "Seriki Group", 
+        "Soaif Travel", "Mukareem", "AL-Lagusyy", "Al-Wafah", 
+        "Travel nest", "AT-Tibyan", "AL-Haqq", "AL-Bushrah", 
+        "AL-Shambagy", "Portfolio (Musty)", "AL-furqan", "Baseeroh", 
+        "Alh-Adua agba", "Nurul-qulub", "Nokbah", "Al-Jannah Travels", 
+        "Voyagemistry", "Umrah UK"
+    ]
+    
+    TRANSPORT_LIST = [
+        "Select Transport...", 
+        "Full Airport Transportation", 
+        "Half Airport Transportation", 
+        "Full Route Transportation"
+    ]
+    
+    VISA_COMPANY_LIST = [
+        "Select Visa Company...", 
+        "Aydh", "Roya", "Makareem", "Arkan", "Lamar", "Chiroma", "Ahali"
+    ]
     makkah_options, madinah_options = load_hotel_database()
 
     colA, colB = st.columns(2)
