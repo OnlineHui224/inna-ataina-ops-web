@@ -6,3 +6,4 @@ Pillow
 python-docx
 pandas
 openpyxl
+st-gsheets
