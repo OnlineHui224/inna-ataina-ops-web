@@ -132,42 +132,50 @@ with tab_flights:
 # ------------------------------------------
 # TAB 2: VISAS & LOGISTICS (The New Excel Tool)
 # ------------------------------------------
+# ------------------------------------------
+# TAB 2: VISAS & LOGISTICS (The New Excel Tool)
+# ------------------------------------------
 with tab_visas:
     st.markdown("### Master Excel Database Logger")
     st.info("Extract visa details and log the full package directly to the Master Excel File.")
     
-   # 1. Your Real-World Dropdown Lists
     AGENT_LIST = [
-        "Select Agent...", 
-        "Inna-Ataina", "AshTag", "Al-Mubarak", "Seriki Group", 
-        "Soaif Travel", "Mukareem", "AL-Lagusyy", "Al-Wafah", 
-        "Travel nest", "AT-Tibyan", "AL-Haqq", "AL-Bushrah", 
-        "AL-Shambagy", "Portfolio (Musty)", "AL-furqan", "Baseeroh", 
-        "Alh-Adua agba", "Nurul-qulub", "Nokbah", "Al-Jannah Travels", 
-        "Voyagemistry", "Umrah UK"
+        "Select Agent...", "Inna-Ataina", "AshTag", "Al-Mubarak", "Seriki Group", 
+        "Soaif Travel", "Mukareem", "AL-Lagusyy", "Al-Wafah", "Travel nest", 
+        "AT-Tibyan", "AL-Haqq", "AL-Bushrah", "AL-Shambagy", "Portfolio (Musty)", 
+        "AL-furqan", "Baseeroh", "Alh-Adua agba", "Nurul-qulub", "Nokbah", 
+        "Al-Jannah Travels", "Voyagemistry", "Umrah UK", "Other (Manual Entry)"
     ]
-    
     TRANSPORT_LIST = [
-        "Select Transport...", 
-        "Full Airport Transportation", 
-        "Half Airport Transportation", 
-        "Full Route Transportation"
+        "Select Transport...", "Full Airport Transportation", "Half Airport Transportation", 
+        "Full Route Transportation", "Other (Manual Entry)"
+    ]
+    VISA_COMPANY_LIST = [
+        "Select Visa Company...", "Aydh", "Roya", "Makareem", "Arkan", 
+        "Lamar", "Chiroma", "Ahali", "Other (Manual Entry)"
     ]
     
-    VISA_COMPANY_LIST = [
-        "Select Visa Company...", 
-        "Aydh", "Roya", "Makareem", "Arkan", "Lamar", "Chiroma", "Ahali"
-    ]
     makkah_options, madinah_options = load_hotel_database()
+    makkah_options.append("Other (Manual Entry)")
+    madinah_options.append("Other (Manual Entry)")
 
     colA, colB = st.columns(2)
     with colA:
         sel_agent = st.selectbox("Agent Name", options=AGENT_LIST)
+        final_agent = st.text_input("Type Agent Name:") if sel_agent == "Other (Manual Entry)" else sel_agent
+        
         sel_transport = st.selectbox("Transportation Package", options=TRANSPORT_LIST)
+        final_transport = st.text_input("Type Transportation:") if sel_transport == "Other (Manual Entry)" else sel_transport
+        
         sel_visa_comp = st.selectbox("Visa Insurance Company", options=VISA_COMPANY_LIST)
+        final_visa_comp = st.text_input("Type Visa Company:") if sel_visa_comp == "Other (Manual Entry)" else sel_visa_comp
+
     with colB:
         sel_makkah = st.selectbox("Makkah Hotel (Visa Log)", options=makkah_options, key="v_mak")
+        final_makkah = st.text_input("Type Makkah Hotel:") if sel_makkah == "Other (Manual Entry)" else sel_makkah
+        
         sel_madinah = st.selectbox("Madinah Hotel (Visa Log)", options=madinah_options, key="v_mad")
+        final_madinah = st.text_input("Type Madinah Hotel:") if sel_madinah == "Other (Manual Entry)" else sel_madinah
         
     col_dep, col_arr = st.columns(2)
     with col_dep:
@@ -181,8 +189,10 @@ with tab_visas:
     if st.button("🚀 Extract Visa & Log to Excel", type="primary"):
         if visa_file is None:
             st.error("Upload a Visa document first!")
-        elif "Select" in sel_agent or "Select" in sel_transport or "Select" in sel_visa_comp:
-            st.warning("Please select Agent, Transport, and Visa Company from the dropdowns.")
+        elif "Select" in final_agent or "Select" in final_transport or "Select" in final_visa_comp:
+            st.warning("Please fully select or type Agent, Transport, and Visa Company.")
+        elif not final_agent or not final_transport or not final_visa_comp:
+            st.warning("Manual entry fields cannot be empty!")
         else:
             with st.spinner("Extracting Visa Data & Updating Excel..."):
                 try:
@@ -193,16 +203,16 @@ with tab_visas:
                     visa_data = v_extractor.extract(visa_file)
                     
                     full_log_data = {
-                        "AGENT NAME": sel_agent,
+                        "AGENT NAME": final_agent,
                         "VISA NUMBER": visa_data.get("VISA NUMBER", "N/A"),
                         "PASSPORT NUMBER": visa_data.get("PASSPORT NUMBER", "N/A"),
                         "NAME": visa_data.get("NAME", "N/A"),
                         "DEPARTURE DATE": date_dep.strftime("%d-%b-%Y"),
                         "ARRIVAL DATE": date_arr.strftime("%d-%b-%Y"),
-                        "MAKKAH HOTEL": sel_makkah,
-                        "MEDINAH HOTEL": sel_madinah,
-                        "TRANSPORTATION": sel_transport,
-                        "VISA COMPANY": sel_visa_comp
+                        "MAKKAH HOTEL": final_makkah,
+                        "MEDINAH HOTEL": final_madinah,
+                        "TRANSPORTATION": final_transport,
+                        "VISA COMPANY": final_visa_comp
                     }
                     
                     file_path = db_logger.log_visa(full_log_data)
