@@ -1,12 +1,13 @@
-import os
+import streamlit as st
+from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import re
 
 class ExcelLogger:
-    def __init__(self, excel_path="output/contract_visas_documentation.xlsx"):
-        self.excel_path = excel_path
+    def __init__(self):
+        # Initializes the secure connection to Google Sheets using your Secrets
+        self.conn = st.connection("gsheets", type=GSheetsConnection)
         
-        # Changed "DATE" to "SERIAL NUMBER"
         self.columns = [
             "SERIAL NUMBER", "AGENT NAME", "VISA NUMBER", "PASSPORT NUMBER", 
             "NAME", "DEPARTURE DATE", "ARRIVAL DATE", 
@@ -22,14 +23,13 @@ class ExcelLogger:
             "AL-Shambagy": "SHA", "Portfolio (Musty)": "POR", "AL-furqan": "FUR", 
             "Baseeroh": "BAS", "Alh-Adua agba": "ADU", "Nurul-qulub": "NUR", 
             "Nokbah": "NOK", "Al-Jannah Travels": "JAN", "Voyagemistry": "VOY", 
-            "Umrah UK": "UMR"
+            "Umrah UK": "UMR", "Saheed": "SAH", "WakaNow": "WAK", "Chiroma": "CHI"
         }
 
     def _generate_serial_number(self, agent_name: str, df_existing: pd.DataFrame) -> str:
-        """Finds the agent prefix, checks the Excel file, and adds 1 to the highest count."""
+        """Reads the live cloud sheet to find the true, absolute highest serial number."""
         prefix = self.agent_prefixes.get(agent_name)
         
-        # If it's a brand new custom agent, auto-generate a 4-letter prefix
         if not prefix:
             clean_name = re.sub(r'[^A-Za-z]', '', agent_name).upper()
             prefix = clean_name[:4] if len(clean_name) >= 4 else clean_name.ljust(3, 'X')
@@ -37,14 +37,12 @@ class ExcelLogger:
         if df_existing.empty or "SERIAL NUMBER" not in df_existing.columns:
             return f"{prefix}001"
         
-        # Search the database for all serial numbers matching this prefix
         serials = df_existing["SERIAL NUMBER"].dropna().astype(str)
         matching_serials = serials[serials.str.startswith(prefix)]
         
         if matching_serials.empty:
             return f"{prefix}001"
         
-        # Find the highest number and add 1
         max_num = 0
         for s in matching_serials:
             match = re.search(r'(\d+)$', s)
@@ -53,34 +51,28 @@ class ExcelLogger:
                 if num > max_num:
                     max_num = num
         
-        next_num = max_num + 1
-        return f"{prefix}{next_num:03d}"
+        return f"{prefix}{(max_num + 1):03d}"
 
-    def log_visa(self, data_dict: dict):
-        if os.path.exists(self.excel_path):
-            df_existing = pd.read_excel(self.excel_path, dtype=str)
-        else:
+    def log_visa(self, data_dict: dict, sheet_url: str):
+        """Pulls the live cloud sheet, appends data, and updates it instantly."""
+        # 1. Read directly from the Live Google Sheet
+        try:
+            df_existing = self.conn.read(spreadsheet=sheet_url, ttl=0) 
+            df_existing = df_existing.dropna(how='all')
+        except Exception:
             df_existing = pd.DataFrame(columns=self.columns)
 
-        # Generate the smart serial number
+        # 2. Generate the Serial Number based on true cloud totals
         final_agent = data_dict.get("AGENT NAME", "UNKNOWN")
         data_dict["SERIAL NUMBER"] = self._generate_serial_number(final_agent, df_existing)
         
+        # 3. Format the row cleanly
         row_data = {col: str(data_dict.get(col, "")).strip() for col in self.columns}
         df_new = pd.DataFrame([row_data])
+        
+        # 4. Combine existing data with the new entry
         df_combined = pd.concat([df_existing, df_new], ignore_index=True)
         
-        os.makedirs(os.path.dirname(self.excel_path), exist_ok=True)
-        
-        with pd.ExcelWriter(self.excel_path, engine='openpyxl') as writer:
-            df_combined.to_excel(writer, index=False, sheet_name="Visas")
-            worksheet = writer.sheets["Visas"]
-            for col in worksheet.columns:
-                max_len = 0
-                col_letter = col[0].column_letter
-                for cell in col:
-                    if cell.value:
-                        max_len = max(max_len, len(str(cell.value)))
-                worksheet.column_dimensions[col_letter].width = max(max_len + 4, 15)
-        
-        return self.excel_path
+        # 5. Push the data straight back up to the Google Sheet cloud
+        self.conn.update(spreadsheet=sheet_url, data=df_combined)
+        return df_combined
