@@ -26,8 +26,8 @@ class VisaExtractor:
             "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
         }
 
-        # FIX: Swapped 2.5-flash to 1.5-flash to fix the 404 error
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        # Restored to gemini-2.5-flash with secure headers
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
         headers = {
             "x-goog-api-key": self.api_key,
             "Content-Type": "application/json"
