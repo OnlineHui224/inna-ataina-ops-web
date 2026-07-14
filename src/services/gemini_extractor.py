@@ -99,10 +99,12 @@ class GeminiExtractor:
             }
 
             # 3. Talk directly to the Gemini 2.5 Flash Server
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
-            
-            response = requests.post(url, json=payload)
-            response.raise_for_status() # Catch any server errors immediately
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+            headers = {
+                "x-goog-api-key": self.api_key,
+                "Content-Type": "application/json"
+            }
+            response = requests.post(url, headers=headers, json=payload)
             
             data = response.json()
             raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
