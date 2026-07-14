@@ -1,12 +1,16 @@
 import base64
-import json
 import requests
+import json
+from src.core.logger import logger
 
 class VisaExtractor:
     def __init__(self, api_key: str):
         self.api_key = api_key.strip() if api_key else ""
+        if not self.api_key:
+            raise ValueError("API key missing")
 
     def extract(self, uploaded_file) -> dict:
+        # Exact prompt structure
         prompt = (
             "You are a Visa data extractor. Read this travel document/visa. "
             "Extract ONLY: NAME, PASSPORT NUMBER, VISA NUMBER. "
@@ -16,19 +20,22 @@ class VisaExtractor:
         file_bytes = uploaded_file.getvalue()
         b64_data = base64.b64encode(file_bytes).decode("utf-8")
         
-        # This payload structure works in your Flight tab
+        # Build payload exactly like the Flight tab
         payload = {
             "contents": [{
                 "parts": [
-                    {"text": prompt}, 
+                    {"text": prompt},
                     {"inline_data": {"mime_type": uploaded_file.type, "data": b64_data}}
                 ]
             }],
-            "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
+            "generationConfig": {
+                "temperature": 0.0, 
+                "responseMimeType": "application/json"
+            }
         }
 
-        # Use the exact URL from your working Flight tab
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        # Exact URL from your working Flight tab
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
         
         headers = {
             "x-goog-api-key": self.api_key,
@@ -36,10 +43,10 @@ class VisaExtractor:
         }
         
         response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
         
-        raw_text = response.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-        if raw_text.startswith("```"):
-            raw_text = raw_text.strip("`").replace("json\n", "")
+        # If it fails, we will know exactly why in the logs
+        if response.status_code != 200:
+            logger.error(f"API Error {response.status_code}: {response.text}")
+            raise ValueError(f"API Request failed: {response.text}")
             
-        return json.loads(raw_text)
+        return json.loads(response.json()["candidates"][0]["content"]["parts"][0]["text"])
