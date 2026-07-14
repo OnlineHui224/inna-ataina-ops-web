@@ -5,13 +5,9 @@ import requests
 class VisaExtractor:
     def __init__(self, api_key: str):
         self.api_key = api_key.strip() if api_key else ""
-
-    def extract(self, uploaded_file) -> dict:
-        # Prompt for Visa data
-        prompt = (
-            "You are a Visa data extractor. Read this travel document/visa. "
-            "Extract ONLY: NAME, PASSPORT NUMBER, VISA NUMBER. "
-            "Return JSON: {\"NAME\": \"string\", \"PASSPORT NUMBER\": \"string\", \"VISA NUMBER\": \"string\"}"
+def extract(self, uploaded_file) -> dict:
+        print("DEBUG_CHECK: I AM RUNNING THE NEW FILE") # Add this line
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
         )
 
         file_bytes = uploaded_file.getvalue()
