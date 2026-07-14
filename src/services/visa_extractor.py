@@ -7,7 +7,7 @@ class VisaExtractor:
         self.api_key = api_key.strip()
 
     def extract(self, uploaded_file) -> dict:
-        """Reads a Visa PDF/Image and extracts only the core ID details via REST API."""
+        """Reads a Visa PDF/Image and extracts core ID details via REST API."""
         prompt = (
             "You are a Visa data extractor. Read this travel document/visa. "
             "Extract ONLY the following 3 things: \n"
@@ -26,12 +26,13 @@ class VisaExtractor:
             "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
         }
 
-        # Restored to gemini-2.5-flash with secure headers
+        # Using the exact URL format that works in your Flight tab
         url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
         headers = {
             "x-goog-api-key": self.api_key,
             "Content-Type": "application/json"
         }
+        
         response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
         
