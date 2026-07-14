@@ -26,8 +26,12 @@ class VisaExtractor:
             "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
         }
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
-        response = requests.post(url, json=payload)
+      url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json"
+        }
+        response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
         
         raw_text = response.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
