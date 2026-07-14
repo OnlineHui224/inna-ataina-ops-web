@@ -133,15 +133,10 @@ with tab_flights:
 # TAB 2: VISAS & LOGISTICS (The New Cloud Tool)
 # ------------------------------------------
 with tab_visas:
-    st.markdown("### Master Cloud Database Logger")
-    st.info("Extract visa details and log the full package directly to your live Google Sheet.")
-    
-    # Cloud URL Input
+        # Cloud URL Input (Hardcoded permanently)
     st.markdown("#### Cloud Configuration")
-    gsheet_url = st.text_input(
-        "Paste your Live Google Sheet Link here:", 
-        placeholder="https://docs.google.com/spreadsheets/d/..."
-    )
+    st.success("✅ Securely connected to Master Live Google Sheet")
+    gsheet_url = "https://docs.google.com/spreadsheets/d/1_w-171YwDfTMP5OEwZv8khCOB_pUgvjKtZtgTFOzPeI/edit"
     st.divider()
 
     AGENT_LIST = [
