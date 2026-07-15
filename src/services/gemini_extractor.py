@@ -98,10 +98,11 @@ class GeminiExtractor:
                 }
             }
 
-            # 3. Talk directly to the Gemini Server
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+           # 3. Talk directly to the Gemini Server
+            # Injecting the API key directly into the URL using ?key=
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
+            
             headers = {
-                "x-goog-api-key": self.api_key,
                 "Content-Type": "application/json"
             }
             response = requests.post(url, headers=headers, json=payload)
