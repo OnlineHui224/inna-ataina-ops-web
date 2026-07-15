@@ -1,15 +1,15 @@
-import base64
-import requests
 import json
+import google.generativeai as genai
 from src.core.logger import logger
 
 class VisaExtractor:
     def __init__(self, api_key: str):
-        # 1. HARDCODE TEST: Paste your exact AQ. key inside the quotes below!
-        self.api_key = "AQ.PASTE_YOUR_EXACT_KEY_HERE"
-        
+        self.api_key = api_key.strip() if api_key else ""
         if not self.api_key:
             raise ValueError("API key missing")
+        
+        # 1. The SDK handles ALL authentication, headers, and OAuth routing automatically
+        genai.configure(api_key=self.api_key)
 
     def extract(self, uploaded_file) -> dict:
         prompt = (
@@ -18,39 +18,26 @@ class VisaExtractor:
             "Return JSON: {\"NAME\": \"string\", \"PASSPORT NUMBER\": \"string\", \"VISA NUMBER\": \"string\"}"
         )
 
-        file_bytes = uploaded_file.getvalue()
-        b64_data = base64.b64encode(file_bytes).decode("utf-8")
-        
-        payload = {
-            "contents": [{
-                "parts": [
-                    {"text": prompt},
-                    {"inline_data": {"mime_type": uploaded_file.type, "data": b64_data}}
-                ]
-            }],
-            "generationConfig": {
-                "temperature": 0.0, 
-                "responseMimeType": "application/json"
-            }
-        }
-
-        # 2. FIXED URL: Using 1.5-flash and injecting your API key directly
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
-        
-        # 3. FIXED HEADERS: Removed the x-goog-api-key to stop the 401 OAuth error
-        headers = {
-            "Content-Type": "application/json"
-        }
-        
-        response = requests.post(url, headers=headers, json=payload)
-        
-        if response.status_code != 200:
-            logger.error(f"API Error {response.status_code}: {response.text}")
-            raise ValueError(f"API Request failed: {response.text}")
+        try:
+            # 2. Initialize the correct, stable model
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
-        raw_text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-        
-        if "```" in raw_text:
-            raw_text = raw_text.replace("```json", "").replace("```", "").strip()
+            # 3. Let the SDK handle the file bytes natively (no manual base64 needed)
+            file_bytes = uploaded_file.getvalue()
             
-        return json.loads(raw_text)
+            # 4. Call the API using the official SDK method
+            response = model.generate_content(
+                [prompt, {"mime_type": uploaded_file.type, "data": file_bytes}],
+                generation_config={"temperature": 0.0, "response_mime_type": "application/json"}
+            )
+            
+            # 5. Parse the result safely
+            raw_text = response.text.strip()
+            if "```" in raw_text:
+                raw_text = raw_text.replace("```json", "").replace("```", "").strip()
+                
+            return json.loads(raw_text)
+            
+        except Exception as e:
+            logger.error(f"SDK Extraction failed: {str(e)}")
+            raise ValueError(f"API Request failed via SDK: {str(e)}")
