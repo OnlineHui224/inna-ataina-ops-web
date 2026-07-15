@@ -69,7 +69,7 @@ class GeminiExtractor:
             "6) Convert all departure and arrival cities/countries into their official 3-letter IATA airport codes.\n"
         )
 
-   def extract(self, uploaded_files) -> TicketData:
+    def extract(self, uploaded_files) -> TicketData:
         """Bypasses the deprecated library and connects directly to Google's REST API."""
         logger.info(f"Starting direct REST API extraction for {len(uploaded_files)} file(s)...")
         
@@ -88,63 +88,4 @@ class GeminiExtractor:
                     }
                 })
 
-            # 2. Package the exact payload Google expects
-            payload = {
-                "contents": [{"parts": parts}],
-                "generationConfig": {
-                    "temperature": 0.0,
-                    "responseMimeType": "application/json",
-                    "responseSchema": self._ticket_data_response_schema()
-                }
-            }
-
-            # 3. Talk directly to the Gemini Server
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-            headers = {
-                "x-goog-api-key": self.api_key,
-                "Content-Type": "application/json"
-            }
-            response = requests.post(url, headers=headers, json=payload)
-            
-            # --- CRASH PROTECTION ADDED HERE ---
-            if response.status_code != 200:
-                logger.error(f"Google API Error Code {response.status_code}: {response.text}")
-                raise ValueError(f"Google API returned error status {response.status_code}. Details: {response.text}")
-                
-            data = response.json()
-            
-            if "candidates" not in data:
-                logger.error(f"Google API Response missing 'candidates'. Full response: {data}")
-                raise ValueError(f"Google API rejected request. Check restrictions or safety settings. Details: {data}")
-            # --- END OF CRASH PROTECTION ---
-
-            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
-            
-            if not raw_text:
-                raise ValueError("Gemini returned an empty response.")
-
-            # 4. Clean up any markdown blocks and parse the JSON
-            text = raw_text.strip()
-            if text.startswith("```"):
-                text = text.strip("`")
-                if text.lower().startswith("json"):
-                    text = text[4:].strip()
-
-            raw_json = json.loads(text)
-            validated_data = TicketData(**raw_json)
-
-            logger.info("Successfully extracted multi-file data via REST.")
-            return validated_data
-
-        except requests.exceptions.RequestException as exc:
-            err_msg = str(exc)
-            if exc.response is not None:
-                err_msg += f" Response: {exc.response.text}"
-            logger.error("REST API extraction failed: %s", err_msg)
-            raise ValueError(f"API Request failed: {err_msg}") from exc
-        except ValidationError as exc:
-            logger.error("Pydantic validation failed: %s", exc)
-            raise ValueError(f"Extracted data failed schema validation: {exc}") from exc
-        except Exception as exc:
-            logger.error("Extraction failed: %s", exc)
-            raise
+            # 2. Package the exact payload
