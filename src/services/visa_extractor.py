@@ -5,12 +5,13 @@ from src.core.logger import logger
 
 class VisaExtractor:
     def __init__(self, api_key: str):
-        self.api_key = api_key.strip() if api_key else ""
+        # 1. HARDCODE TEST: Paste your exact AQ. key inside the quotes below!
+        self.api_key = "AQ.PASTE_YOUR_EXACT_KEY_HERE"
+        
         if not self.api_key:
             raise ValueError("API key missing")
 
     def extract(self, uploaded_file) -> dict:
-        # Exact prompt structure
         prompt = (
             "You are a Visa data extractor. Read this travel document/visa. "
             "Extract ONLY: NAME, PASSPORT NUMBER, VISA NUMBER. "
@@ -20,7 +21,6 @@ class VisaExtractor:
         file_bytes = uploaded_file.getvalue()
         b64_data = base64.b64encode(file_bytes).decode("utf-8")
         
-        # Build payload exactly like the Flight tab
         payload = {
             "contents": [{
                 "parts": [
@@ -34,19 +34,23 @@ class VisaExtractor:
             }
         }
 
-        # Exact URL from your working Flight tab
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        # 2. FIXED URL: Using 1.5-flash and injecting your API key directly
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
         
+        # 3. FIXED HEADERS: Removed the x-goog-api-key to stop the 401 OAuth error
         headers = {
-            "x-goog-api-key": self.api_key,
             "Content-Type": "application/json"
         }
         
         response = requests.post(url, headers=headers, json=payload)
         
-        # If it fails, we will know exactly why in the logs
         if response.status_code != 200:
             logger.error(f"API Error {response.status_code}: {response.text}")
             raise ValueError(f"API Request failed: {response.text}")
             
-        return json.loads(response.json()["candidates"][0]["content"]["parts"][0]["text"])
+        raw_text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        
+        if "```" in raw_text:
+            raw_text = raw_text.replace("```json", "").replace("```", "").strip()
+            
+        return json.loads(raw_text)
