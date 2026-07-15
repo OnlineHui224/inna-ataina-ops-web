@@ -10,7 +10,8 @@ from src.models.data_schemas import TicketData
 
 class GeminiExtractor:
     def __init__(self, api_key: str):
-        self.api_key = api_key.strip() if api_key else ""
+        # 1. HARDCODE TEST: Paste your exact AQ. key inside the quotes below!
+        self.api_key = "AQ.Ab8RN6L4AszXPovW98eRwSi8D33NYnAJfn2jwa50uhnFwJuIA"
         
         if not self.api_key:
             logger.error("No API key provided.")
@@ -18,7 +19,6 @@ class GeminiExtractor:
 
     @staticmethod
     def _ticket_data_response_schema() -> Dict[str, Any]:
-        """Strict OpenAPI Schema for the raw REST API."""
         return {
             "type": "OBJECT",
             "properties": {
@@ -70,13 +70,11 @@ class GeminiExtractor:
         )
 
     def extract(self, uploaded_files) -> TicketData:
-        """Bypasses the deprecated library and connects directly to Google's REST API."""
         logger.info(f"Starting direct REST API extraction for {len(uploaded_files)} file(s)...")
         
         parts = [{"text": self._build_prompt()}]
 
         try:
-            # 1. Convert all uploaded files into raw binary data
             for uploaded_file in uploaded_files:
                 file_bytes = uploaded_file.getvalue()
                 mime_type = uploaded_file.type
@@ -88,7 +86,6 @@ class GeminiExtractor:
                     }
                 })
 
-            # 2. Package the exact payload Google expects
             payload = {
                 "contents": [{"parts": parts}],
                 "generationConfig": {
@@ -98,13 +95,14 @@ class GeminiExtractor:
                 }
             }
 
-           # 3. Talk directly to the Gemini Server
-            # Injecting the API key directly into the URL using ?key=
+            # 2. FIXED URL: Using 1.5-flash and injecting your API key directly
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
             
+            # 3. FIXED HEADERS: Removed x-goog-api-key to stop the 401 OAuth error
             headers = {
                 "Content-Type": "application/json"
             }
+            
             response = requests.post(url, headers=headers, json=payload)
             
             if response.status_code != 200:
@@ -122,7 +120,6 @@ class GeminiExtractor:
             if not raw_text:
                 raise ValueError("Gemini returned an empty response.")
 
-            # 4. Clean up any markdown blocks and parse the JSON
             text = raw_text.strip()
             if text.startswith("```"):
                 text = text.strip("`")
