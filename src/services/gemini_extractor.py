@@ -69,7 +69,7 @@ class GeminiExtractor:
             "6) Convert all departure and arrival cities/countries into their official 3-letter IATA airport codes.\n"
         )
 
-    def extract(self, uploaded_files) -> TicketData:
+   def extract(self, uploaded_files) -> TicketData:
         """Bypasses the deprecated library and connects directly to Google's REST API."""
         logger.info(f"Starting direct REST API extraction for {len(uploaded_files)} file(s)...")
         
@@ -98,15 +98,26 @@ class GeminiExtractor:
                 }
             }
 
-            # 3. Talk directly to the Gemini 2.5 Flash Server
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+            # 3. Talk directly to the Gemini Server
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
             headers = {
                 "x-goog-api-key": self.api_key,
                 "Content-Type": "application/json"
             }
             response = requests.post(url, headers=headers, json=payload)
             
+            # --- CRASH PROTECTION ADDED HERE ---
+            if response.status_code != 200:
+                logger.error(f"Google API Error Code {response.status_code}: {response.text}")
+                raise ValueError(f"Google API returned error status {response.status_code}. Details: {response.text}")
+                
             data = response.json()
+            
+            if "candidates" not in data:
+                logger.error(f"Google API Response missing 'candidates'. Full response: {data}")
+                raise ValueError(f"Google API rejected request. Check restrictions or safety settings. Details: {data}")
+            # --- END OF CRASH PROTECTION ---
+
             raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
             
             if not raw_text:
