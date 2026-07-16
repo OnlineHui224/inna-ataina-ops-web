@@ -32,8 +32,8 @@ class VisaExtractor:
             }
         }
 
-        # Original URL
-        url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent)"
+       # Updated to the -latest alias
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
         
         # Original Headers
         headers = {
