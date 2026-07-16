@@ -10,8 +10,8 @@ from src.models.data_schemas import TicketData
 
 class GeminiExtractor:
     def __init__(self, api_key: str):
-        # 1. HARDCODE TEST: Paste your exact AQ. key inside the quotes below!
-        self.api_key = "AQ.Ab8RN6L4AszXPovW98eRwSi8D33NYnAJfn2jwa50uhnFwJuIA"
+        # Reverted to securely reading the API key, no hardcoding.
+        self.api_key = api_key.strip() if api_key else ""
         
         if not self.api_key:
             logger.error("No API key provided.")
@@ -95,11 +95,12 @@ class GeminiExtractor:
                 }
             }
 
-            # 2. FIXED URL: Using 1.5-flash and injecting your API key directly
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
+            # Back to the original URL
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
             
-            # 3. FIXED HEADERS: Removed x-goog-api-key to stop the 401 OAuth error
+            # Back to the original Headers
             headers = {
+                "x-goog-api-key": self.api_key,
                 "Content-Type": "application/json"
             }
             
