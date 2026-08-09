@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-5ba8a645-439c-4bee-85ee-13a3eb89e1ab/styles.css">
+<script src="_ds/modernist-5ba8a645-439c-4bee-85ee-13a3eb89e1ab/_ds_bundle.js"></script>
+<style>
+:root{
+  --color-bg:#f4f6f8; --color-surface:#ffffff; --color-text:#0b1626;
+  --color-accent:#1e9bd7; --color-accent-600:#1682b8; --color-accent-700:#0f6e9c;
+  --color-divider:color-mix(in srgb,#0b1626 22%,transparent);
+  --ink:#0b1626; --ink-2:#12233a; --ink-3:#1c3350;
+  --cy:#1e9bd7; --cy-6:#1682b8; --cy-1:#e8f4fb; --cy-2:#cbe7f7;
+  --steel:#6b7c8f; --line:#dde3e9; --danger:#c8321a; --ok:#1c7f5a; --warn:#b06a00;
+}
+body{background:var(--color-bg);color:var(--ink);font-size:15px}
+h1,h2,h3,h4,h5,h6{letter-spacing:-.02em}
+a{color:var(--cy-6)}
+a:hover{color:var(--ink)}
+@keyframes opsFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes opsSweep{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes opsPulse{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+</helmet>
+
+<div style="display:grid;grid-template-columns:264px 1fr;min-height:100vh;font-family:Archivo,system-ui,sans-serif">
+
+  <aside style="background:var(--ink);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+    <div style="padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;gap:12px;align-items:center">
+      <img src="uploads/inna_ataina_badge.png" alt="Inna Ataina Travels" style="width:42px;height:42px;border-radius:50%;background:#fff;object-fit:cover;flex:none">
+      <div style="min-width:0">
+        <div style="font-weight:800;font-size:13px;letter-spacing:.02em;line-height:1.15">INNA ATAINA</div>
+        <div style="font-size:10px;letter-spacing:.22em;color:var(--cy);font-weight:600">OPS PRO</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;overflow-y:auto;padding:16px 12px;display:flex;flex-direction:column;gap:2px">
+      <div style="font-size:9.5px;letter-spacing:.18em;color:#68829b;font-weight:600;padding:10px 10px 6px">OVERVIEW</div>
+      <a href="#" onClick="{{ goDash }}" style="{{ nDash }}" style-hover="background:rgba(255,255,255,.07)">Dashboard</a>
+
+      <div style="font-size:9.5px;letter-spacing:.18em;color:#68829b;font-weight:600;padding:14px 10px 6px">OPERATIONS</div>
+      <a href="#" onClick="{{ goFlight }}" style="{{ nFlight }}" style-hover="background:rgba(255,255,255,.07)">Flight Document Ops</a>
+      <a href="#" onClick="{{ goVisa }}" style="{{ nVisa }}" style-hover="background:rgba(255,255,255,.07)">Visa &amp; Contract Logger</a>
+
+      <div style="font-size:9.5px;letter-spacing:.18em;color:#68829b;font-weight:600;padding:14px 10px 6px">DATA &amp; RESOURCES</div>
+      <a href="#" onClick="{{ goHotels }}" style="{{ nHotels }}" style-hover="background:rgba(255,255,255,.07)">Hotel Directory</a>
+      <a href="#" onClick="{{ goActivity }}" style="{{ nActivity }}" style-hover="background:rgba(255,255,255,.07)">Recent Activity</a>
+
+      <div style="font-size:9.5px;letter-spacing:.18em;color:#68829b;font-weight:600;padding:14px 10px 6px">MILESTONE 1</div>
+      <a href="#" onClick="{{ goAudit }}" style="{{ nAudit }}" style-hover="background:rgba(255,255,255,.07)">Product Audit Report</a>
+      <a href="#" onClick="{{ goDS }}" style="{{ nDS }}" style-hover="background:rgba(255,255,255,.07)">Design Foundation</a>
+      <a href="#" onClick="{{ goStates }}" style="{{ nStates }}" style-hover="background:rgba(255,255,255,.07)">Component State Library</a>
+
+      <div style="font-size:9.5px;letter-spacing:.18em;color:#68829b;font-weight:600;padding:14px 10px 6px">SYSTEM</div>
+      <a href="#" onClick="{{ goSettings }}" style="{{ nSettings }}" style-hover="background:rgba(255,255,255,.07)">Settings</a>
+      <a href="#" onClick="{{ goHelp }}" style="{{ nHelp }}" style-hover="background:rgba(255,255,255,.07)">Help / User Guide</a>
+    </nav>
+
+    <div style="padding:14px 20px 18px;border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px">
+      <span style="width:7px;height:7px;background:var(--warn);display:block;animation:opsPulse 2.4s infinite;flex:none"></span>
+      <div style="font-size:11px;line-height:1.3">
+        <div style="color:#b9c7d4">Master Database</div>
+        <div style="color:#7e93a7;font-size:10px">{{ storageLabel }}</div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="min-width:0;display:flex;flex-direction:column">
+    <header style="position:sticky;top:0;z-index:20;background:rgba(244,246,248,.82);backdrop-filter:blur(14px);border-bottom:2px solid var(--color-divider);padding:16px 34px;display:flex;align-items:center;gap:24px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;letter-spacing:.16em;color:var(--steel);font-weight:600">{{ crumb }}</div>
+        <div style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:2px">{{ title }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:7px 12px">
+        <span style="width:6px;height:6px;background:var(--ok);display:block"></span>
+        <span style="font-size:11px;font-weight:600;color:var(--ink-3);white-space:nowrap">System Online</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding-left:18px;border-left:1px solid var(--line)">
+        <div style="width:32px;height:32px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800">OP</div>
+        <div style="font-size:11.5px;line-height:1.25">
+          <div style="font-weight:700">Operations Staff</div>
+          <div style="color:var(--steel);font-size:10.5px">Single shared session</div>
+        </div>
+      </div>
+    </header>
+
+    <div style="padding:34px;animation:opsFade .3s ease both" key="{{ page }}">
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:26px;max-width:1180px">
+          <section style="background:linear-gradient(112deg,var(--ink) 0%,var(--ink-2) 58%,var(--ink-3) 100%);color:#fff;padding:38px 40px;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:radial-gradient(720px 300px at 88% -30%,rgba(30,155,215,.42),transparent 70%);pointer-events:none"></div>
+            <div style="position:relative">
+              <div style="font-size:10px;letter-spacing:.24em;color:var(--cy);font-weight:600">OPERATIONS AUTOMATION PRO</div>
+              <h1 style="font-size:38px;margin:12px 0 10px;max-width:16ch;line-height:1.05">Operations Home</h1>
+              <p style="margin:0;max-width:56ch;color:#b6c6d6;font-size:14.5px;text-wrap:pretty">Automate flight documents, visa logging and travel operations from one secure workspace.</p>
+            </div>
+          </section>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:22px">
+            <a href="#" onClick="{{ goFlight }}" style="text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-top:3px solid var(--cy);padding:26px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .18s,transform .18s" style-hover="box-shadow:0 12px 32px rgba(11,22,38,.13);transform:translateY(-2px)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+                <div style="width:44px;height:44px;background:var(--cy-1);color:var(--cy-6);display:grid;place-items:center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.5.5 0 0 0-.5.8l3.5 4.2-2.3 2.3-2-.6a.5.5 0 0 0-.5.8l2 2.4 2.4 2a.5.5 0 0 0 .8-.5l-.6-2 2.3-2.3 4.2 3.5a.5.5 0 0 0 .8-.5Z"/></svg>
+                </div>
+                <span style="font-size:9.5px;letter-spacing:.16em;font-weight:600;color:var(--steel);border:1px solid var(--line);padding:4px 8px">MODULE 01</span>
+              </div>
+              <div>
+                <h3 style="font-size:22px;margin:0 0 8px">Flight Document Ops Pro</h3>
+                <p style="margin:0;font-size:13.5px;color:var(--steel);line-height:1.55;text-wrap:pretty">Upload airline tickets, extract journey information, review the reconstructed route, select accommodation and generate the final Word itinerary.</p>
+              </div>
+              <div style="margin-top:auto;padding-top:6px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:13.5px;color:var(--cy-6)">Create Itinerary
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </div>
+            </a>
+
+            <a href="#" onClick="{{ goVisa }}" style="text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-top:3px solid var(--ink-3);padding:26px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .18s,transform .18s" style-hover="box-shadow:0 12px 32px rgba(11,22,38,.13);transform:translateY(-2px)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+                <div style="width:44px;height:44px;background:#eef1f5;color:var(--ink-3);display:grid;place-items:center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.5" width="16" height="19"/><circle cx="12" cy="10" r="3"/><path d="M8.5 17h7"/></svg>
+                </div>
+                <span style="font-size:9.5px;letter-spacing:.16em;font-weight:600;color:var(--steel);border:1px solid var(--line);padding:4px 8px">MODULE 02</span>
+              </div>
+              <div>
+                <h3 style="font-size:22px;margin:0 0 8px">Visa &amp; Contract Logger OP</h3>
+                <p style="margin:0;font-size:13.5px;color:var(--steel);line-height:1.55;text-wrap:pretty">Record the operational and logistics details, upload a visa, extract traveller identity fields and commit the complete record to the master database.</p>
+              </div>
+              <div style="margin-top:auto;padding-top:6px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:13.5px;color:var(--ink-3)">Log Visa / Contract
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </div>
+            </a>
+          </div>
+
+          <section style="background:#fff;border:1px solid var(--line)">
+            <div style="padding:18px 24px;border-bottom:2px solid var(--color-divider);display:flex;align-items:baseline;justify-content:space-between">
+              <h4 style="margin:0;font-size:15px">Recent Activity</h4>
+              <span style="font-size:11px;color:var(--steel)">This session</span>
+            </div>
+            <div style="padding:52px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <div style="width:46px;height:46px;border:2px solid var(--line);display:grid;place-items:center;color:var(--steel)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
+              <div style="font-weight:800;font-size:14px">No activity yet</div>
+              <p style="margin:0;font-size:12.5px;color:var(--steel);max-width:44ch">Generated itineraries and saved visa records will appear here. Activity is read from the live application — nothing is pre-populated.</p>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAudit }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:900px;display:flex;flex-direction:column;gap:30px">
+          <section style="background:#fff;border:1px solid var(--line);border-left:3px solid var(--ok);padding:22px 26px">
+            <h4 style="margin:0 0 8px;font-size:14px;color:var(--ok)">Verified against source — OnlineHui224/inna-ataina-ops-web @ main</h4>
+            <p style="margin:0;font-size:13.5px;color:var(--ink-3);line-height:1.6;text-wrap:pretty">Read directly: <code>web_app.py</code>, <code>excel_logger.py</code>, <code>gemini_extractor.py</code>, <code>visa_extractor.py</code>, <code>data_schemas.py</code>, <code>config/settings.json</code>. The findings below come from that code, not from description. Three of them are defects the redesign must not carry forward.</p>
+          </section>
+
+          <section style="background:#fff;border:1px solid var(--line);border-left:3px solid var(--danger);padding:24px 26px">
+            <h3 style="margin:0 0 4px;font-size:20px;color:var(--danger)">Blocking findings in the current code</h3>
+            <hr class="hr">
+            <div style="display:flex;flex-direction:column;gap:18px">
+              <div>
+                <div style="font-weight:800;font-size:14px;margin-bottom:5px">1 — The app tells staff it saved to Google Sheets. It saves to a local CSV.</div>
+                <p style="margin:0;font-size:13px;color:var(--ink-3);line-height:1.6;text-wrap:pretty"><code>web_app.py</code> prints "Securely connected to Master Live Google Sheet" and passes a hardcoded spreadsheet URL into <code>ExcelLogger.log_visa(...)</code>. That method's own docstring reads "Logs to local CSV instead of Google Sheets" — it accepts <code>sheet_url</code> and never uses it, writing to <code>visa_data.csv</code> in the working directory. On Streamlit Cloud that file is ephemeral. Your form answer said Sheets is live and working; the code says otherwise. <strong>Every saved visa record is at risk.</strong> I will not design a success screen that claims a sync which is not happening.</p>
+              </div>
+              <div>
+                <div style="font-weight:800;font-size:14px;margin-bottom:5px">2 — A live Gemini API key is committed to the repository.</div>
+                <p style="margin:0;font-size:13px;color:var(--ink-3);line-height:1.6;text-wrap:pretty"><code>config/settings.json</code> contains a plaintext <code>gemini_api_key</code>. Rotate it, remove it from the file, and keep the <code>st.secrets</code> / environment path that <code>_get_gemini_api_key()</code> already prefers. A key in git history stays in git history.</p>
+              </div>
+              <div>
+                <div style="font-weight:800;font-size:14px;margin-bottom:5px">3 — Madinah manual entry can never fire.</div>
+                <p style="margin:0;font-size:13px;color:var(--ink-3);line-height:1.6;text-wrap:pretty">The Madinah branch compares the selection to <code>"Other (Manual Sheet)"</code> while the option added to the list is <code>"Other (Manual Entry)"</code>. Choosing it silently logs that literal string instead of opening a text field. One-word fix, but it has been writing bad rows.</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">1 — What I inspected</h3>
+            <hr class="hr">
+            <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.75;color:var(--ink-3)">
+              <li><strong>web_app.py</strong> — the entire Streamlit UI: two tabs, both workflows, every control and message string.</li>
+              <li><strong>data_schemas.py</strong> — the extraction contract: passenger_name, adults, children, pnr, primary_carrier, flights[], ai_confidence.</li>
+              <li><strong>excel_logger.py</strong> — the eleven database columns and the agent-prefix serial generator.</li>
+              <li><strong>gemini_extractor.py / visa_extractor.py</strong> — prompts, IATA normalisation, real failure modes.</li>
+              <li><strong>The three hardcoded lists</strong> — 25 agents, 4 transport packages, 9 visa companies.</li>
+              <li>Not present in the repo: <code>assets/hotels.xlsx</code> and <code>assets/blank_template.docx</code> — the loader already has a "Missing hotels.xlsx" path.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">2 — Features that must survive the redesign</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--cy-6);font-weight:600;margin-bottom:10px">FLIGHT MODULE</div>
+                <ul style="margin:0;padding-left:16px;font-size:12.5px;line-height:1.7;color:var(--ink-3)"><li>Multi-file upload, PDF/JPG/PNG, read as one journey</li><li>Extracts passenger_name, adults, children, pnr, primary_carrier</li><li>Segments carry IATA airport + 2-letter carrier codes, date "DD MMM"</li><li>ai_confidence 0.0–1.0 — currently never shown to staff</li><li>Hotel lists built from a city column matched on makkah|mecca / madina|medina</li><li>Optional group name, then Word generation from blank_template.docx</li></ul>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--ink-3);font-weight:600;margin-bottom:10px">VISA MODULE</div>
+                <ul style="margin:0;padding-left:16px;font-size:12.5px;line-height:1.7;color:var(--ink-3)"><li>25 agents, 4 transport packages, 9 visa companies — each with manual entry</li><li>Makkah/Madinah hotels + departure and arrival dates (DD-MMM-YYYY)</li><li>Visa upload extracts NAME, PASSPORT NUMBER, VISA NUMBER only</li><li>Serial = agent prefix + 3 digits (INNA001, ASH002…), 25 prefixes mapped</li><li>Unknown agents fall back to 4 letters, padded to 3 with X</li><li>Eleven fixed columns; last-5-entries preview after save</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">3 — UI problems identified</h3>
+            <hr class="hr">
+            <div style="display:flex;flex-direction:column">
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">Raw JSON shown to staff</div><div style="font-size:13px;color:var(--steel)">Replace with a passenger card plus an aviation route timeline; JSON moves behind a developer disclosure.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">Two tabs as the whole architecture</div><div style="font-size:13px;color:var(--steel)">Becomes a shell: sidebar, persistent header, and a stepped workspace per module.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">Permanent green success banners</div><div style="font-size:13px;color:var(--steel)">Replaced by transient toasts and dedicated completion screens.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">Hotel dropdowns loading everything</div><div style="font-size:13px;color:var(--steel)">One reusable searchable selector, city-scoped, with selected-hotel card and no-results state.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">False "cloud sync" success message</div><div style="font-size:13px;color:var(--steel)">A confirmed defect, not a wording preference. Storage copy is driven by one prop and stays factual until the Sheets write actually exists.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)"><div style="font-weight:800;font-size:13px">Manual-entry fields always visible</div><div style="font-size:13px;color:var(--steel)">Revealed only when "Other / Manual Entry" is chosen, per section.</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;padding:14px 0"><div style="font-weight:800;font-size:13px">Python tracebacks surfaced to staff</div><div style="font-size:13px;color:var(--steel)">Plain-language error states with Try Again / Replace File / Return to Dashboard; technical detail collapsed.</div></div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">4 — Screens planned</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:12.5px;color:var(--ink-3)">
+              <div style="background:#fff;border:1px solid var(--line);padding:16px"><div style="font-weight:800;margin-bottom:8px">Milestone 2 — Flight</div>Landing · upload empty · files added · extraction progress · extraction error · passenger &amp; journey review · accommodation &amp; group · final summary · generating · itinerary ready · workflow error</div>
+              <div style="background:#fff;border:1px solid var(--line);padding:16px"><div style="font-weight:800;margin-bottom:8px">Milestone 3 — Visa</div>Landing · operational details · three manual-entry states · Makkah + Madinah hotel search · visa upload · extraction · result · full review · confirm dialog · saving · record added · save error · recent records table</div>
+              <div style="background:#fff;border:1px solid var(--line);padding:16px"><div style="font-weight:800;margin-bottom:8px">Milestone 4 — Support</div>Hotel directory · activity · settings · help · offline · API unavailable · hotel DB unavailable · skeletons · generic error · tablet and mobile shells</div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">5 — Needs your approval</h3>
+            <hr class="hr">
+            <ol style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.8;color:var(--ink-3)">
+              <li><strong>Settled from your answers.</strong> Brand navy/cyan leads; Modernist supplies structure, grid and Archivo discipline. No auth, so the header reflects an unauthenticated shared session. 500+ hotels, so every hotel control is a searchable selector — never a plain dropdown.</li>
+              <li><strong>Decide: fix the Sheets write, or change the promise.</strong> Either <code>log_visa</code> genuinely writes to the spreadsheet (gspread + service account) and I design a true sync state, or the app says "Saved locally" and I design an export step. Needed before Milestone 3.</li>
+              <li><strong>Editable extraction.</strong> Extraction is read-only today and <code>ai_confidence</code> is discarded. I propose surfacing confidence and letting staff correct fields before generation — confirm and it enters Milestone 2.</li>
+              <li><strong>hotels.xlsx is not in the repo.</strong> Send it, or the directory and both selectors stay empty by design. Its column names drive what the selector can show.</li>
+              <li><strong>blank_template.docx is not in the repo either</strong> — needed before any itinerary preview can be honest about the output.</li>
+            </ol>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDS }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1080px;display:flex;flex-direction:column;gap:34px">
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Colour</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
+              <div><div style="height:76px;background:var(--ink)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Ink / Navy</div><div style="font-size:11px;color:var(--steel)">#0B1626 — shell, headings</div></div>
+              <div><div style="height:76px;background:var(--ink-3)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Navy 3</div><div style="font-size:11px;color:var(--steel)">#1C3350 — visa module</div></div>
+              <div><div style="height:76px;background:var(--cy)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Brand Cyan</div><div style="font-size:11px;color:var(--steel)">#1E9BD7 — primary action</div></div>
+              <div><div style="height:76px;background:var(--cy-1);border:1px solid var(--line)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Cyan Tint</div><div style="font-size:11px;color:var(--steel)">#E8F4FB — AI surfaces</div></div>
+              <div><div style="height:76px;background:var(--steel)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Steel</div><div style="font-size:11px;color:var(--steel)">#6B7C8F — helper text</div></div>
+              <div><div style="height:76px;background:var(--ok)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Success</div><div style="font-size:11px;color:var(--steel)">#1C7F5A</div></div>
+              <div><div style="height:76px;background:var(--warn)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Warning</div><div style="font-size:11px;color:var(--steel)">#B06A00</div></div>
+              <div><div style="height:76px;background:var(--danger)"></div><div style="font-size:11.5px;font-weight:800;margin-top:8px">Danger</div><div style="font-size:11px;color:var(--steel)">#C8321A — destructive only</div></div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Type — Archivo</h3>
+            <hr class="hr">
+            <div style="background:#fff;border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">PAGE TITLE / 38</span><span style="font-size:38px;font-weight:800;letter-spacing:-.025em">Operations Home</span></div>
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">SECTION / 22</span><span style="font-size:22px;font-weight:800;letter-spacing:-.02em">Flight Document Ops Pro</span></div>
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">CARD / 15</span><span style="font-size:15px;font-weight:800">Passenger Information</span></div>
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">BODY / 13.5</span><span style="font-size:13.5px;color:var(--ink-3)">Upload all tickets belonging to this journey.</span></div>
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">LABEL / 12</span><span style="font-size:12px;font-weight:700;letter-spacing:.02em">MAKKAH HOTEL</span></div>
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline"><span style="font-size:10px;letter-spacing:.14em;color:var(--steel);font-weight:600">HELPER / 11.5</span><span style="font-size:11.5px;color:var(--steel)">PDF, JPG or PNG · up to 10 MB each</span></div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Core components</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">BUTTONS</div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                  <button class="btn btn-primary" style="color:#fff;padding:10px 18px;white-space:nowrap">Extract Flight Data</button>
+                  <button class="btn btn-secondary" style="background:#fff;padding:10px 18px;white-space:nowrap">Back to Review</button>
+                  <button class="btn" style="color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,transparent);padding:10px 18px;white-space:nowrap">Remove File</button>
+                  <button class="btn btn-primary" disabled="{{ true }}" style="color:#fff;padding:10px 18px;white-space:nowrap">Disabled</button>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">STATUS BADGES</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <span class="tag" style="background:#e6f4ee;color:var(--ok);white-space:nowrap">Extraction complete</span>
+                  <span class="tag" style="background:#fdf3e3;color:var(--warn);white-space:nowrap">Missing PNR</span>
+                  <span class="tag" style="background:#fdecea;color:var(--danger);white-space:nowrap">Unreadable file</span>
+                  <span class="tag tag-accent" style="white-space:nowrap">AI extracted</span>
+                  <span class="tag tag-neutral" style="white-space:nowrap">Staff entered</span>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">STEP INDICATOR</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;background:var(--cy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800">1</span><span style="font-size:11.5px;font-weight:800">Upload</span></div>
+                  <span style="flex:1;height:2px;background:var(--cy)"></span>
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800">2</span><span style="font-size:11.5px;font-weight:800">Extract</span></div>
+                  <span style="flex:1;height:2px;background:var(--line)"></span>
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border:1px solid var(--line);color:var(--steel);display:grid;place-items:center;font-size:11px;font-weight:800">3</span><span style="font-size:11.5px;font-weight:700;color:var(--steel)">Review</span></div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">FIELD + SEARCHABLE SELECT</div>
+                <div class="field"><label>MAKKAH HOTEL</label></div>
+                <div class="input" style="display:flex;align-items:center;gap:10px;border-color:var(--cy);box-shadow:0 0 0 3px var(--cy-1);background:#fff">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  <span style="font-size:13.5px;color:var(--steel)">Search Makkah hotels…</span>
+                </div>
+                <div style="font-size:11.5px;color:var(--steel);margin-top:6px">Results are scoped to Makkah only.</div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">UPLOAD ZONE</div>
+                <div style="border:2px dashed var(--cy-2);background:linear-gradient(180deg,var(--cy-1),#fff);padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;transition:border-color .18s" style-hover="border-color:var(--cy)">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--cy-6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                  <div style="font-size:13.5px;font-weight:800">Drop tickets here</div>
+                  <div style="font-size:11.5px;color:var(--steel)">PDF, JPG or PNG · multiple files supported</div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);padding:22px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:14px">PROCESSING (INDETERMINATE)</div>
+                <div style="font-size:13.5px;font-weight:800;margin-bottom:10px">OPS PRO is reading your ticket documents…</div>
+                <div style="height:3px;background:var(--line);overflow:hidden;position:relative"><span style="position:absolute;inset-block:0;width:33%;background:var(--cy);animation:opsSweep 1.5s ease-in-out infinite"></span></div>
+                <div style="font-size:11.5px;color:var(--steel);margin-top:10px">No fake percentages — real progress is not reported by the backend.</div>
+              </div>
+
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStates }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1180px;display:flex;flex-direction:column;gap:34px">
+
+          <p style="margin:0;max-width:72ch;font-size:13.5px;color:var(--steel);line-height:1.6;text-wrap:pretty">Every state each screen can be in, built once here so Milestones 2–4 assemble rather than invent. Values shown are structural placeholders — no invented hotels, agents or passenger records.</p>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Upload zone — four states</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+              <div style="background:#fff;border:1px solid var(--line);padding:18px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">EMPTY</div>
+                <div style="border:2px dashed var(--line);padding:24px;text-align:center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                  <div style="font-size:13px;font-weight:800;margin-top:8px">Drop tickets here</div>
+                  <div style="font-size:11.5px;color:var(--steel);margin-top:4px">PDF, JPG, PNG</div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:18px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--cy-6);font-weight:600;margin-bottom:12px">DRAG OVER</div>
+                <div style="border:2px dashed var(--cy);background:var(--cy-1);padding:24px;text-align:center;box-shadow:0 0 0 4px rgba(30,155,215,.12)">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--cy-6)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                  <div style="font-size:13px;font-weight:800;margin-top:8px;color:var(--cy-6)">Release to add files</div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:18px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">FILES ADDED</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:9px 11px">
+                    <span style="width:26px;height:26px;background:var(--cy-1);color:var(--cy-6);display:grid;place-items:center;font-size:9px;font-weight:800;flex:none">PDF</span>
+                    <span style="flex:1;min-width:0;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">outbound-ticket.pdf</span>
+                    <span style="font-size:11px;color:var(--steel);white-space:nowrap">1.2 MB</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:9px 11px">
+                    <span style="width:26px;height:26px;background:var(--cy-1);color:var(--cy-6);display:grid;place-items:center;font-size:9px;font-weight:800;flex:none">JPG</span>
+                    <span style="flex:1;min-width:0;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">return-leg.jpg</span>
+                    <span style="font-size:11px;color:var(--steel);white-space:nowrap">840 KB</span>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:18px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--danger);font-weight:600;margin-bottom:12px">REJECTED</div>
+                <div style="border:2px dashed color-mix(in srgb,var(--danger) 45%,transparent);background:#fdf3f1;padding:24px;text-align:center">
+                  <div style="font-size:13px;font-weight:800;color:var(--danger)">Unsupported file type</div>
+                  <div style="font-size:11.5px;color:var(--ink-3);margin-top:4px">Only PDF, JPG and PNG can be read.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Extraction — progress, success, failure</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:13.5px;font-weight:800;margin-bottom:10px">Reading your ticket documents…</div>
+                <div style="height:3px;background:var(--line);overflow:hidden;position:relative"><span style="position:absolute;inset-block:0;width:33%;background:var(--cy);animation:opsSweep 1.5s ease-in-out infinite"></span></div>
+                <div style="font-size:11.5px;color:var(--steel);margin-top:10px">Indeterminate by design — the backend reports no progress.</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-left:3px solid var(--ok);padding:20px">
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+                  <span style="font-size:13.5px;font-weight:800">Extraction complete</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--steel);line-height:1.6">Confidence is reported by the model as <code>ai_confidence</code>; low values raise a review prompt instead of blocking.</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-left:3px solid var(--danger);padding:20px">
+                <div style="font-size:13.5px;font-weight:800;color:var(--danger);margin-bottom:6px">We could not read these documents</div>
+                <div style="font-size:12.5px;color:var(--ink-3);line-height:1.6;margin-bottom:12px">The file may be a scan of low quality, or not a ticket. Nothing has been saved.</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-primary" style="color:#fff;padding:8px 14px;white-space:nowrap">Try Again</button>
+                  <button class="btn btn-secondary" style="background:#fff;padding:8px 14px;white-space:nowrap">Replace File</button>
+                </div>
+                <div style="font-size:11px;color:var(--steel);margin-top:12px;border-top:1px solid var(--line);padding-top:10px">Technical detail — collapsed by default, never a raw traceback.</div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Hotel selector — 500+ records, search only</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">TYPING</div>
+                <div class="input" style="display:flex;align-items:center;gap:9px;border-color:var(--cy);box-shadow:0 0 0 3px var(--cy-1);background:#fff">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  <span style="font-size:13px">Hilt</span><span style="width:1px;height:15px;background:var(--ink);animation:opsPulse 1s steps(1) infinite"></span>
+                </div>
+                <div style="border:1px solid var(--line);border-top:0;padding:10px 12px;font-size:12px;color:var(--steel)">Matching Makkah hotels appear here from hotels.xlsx.</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">NO RESULTS</div>
+                <div style="border:1px solid var(--line);padding:22px;text-align:center">
+                  <div style="font-size:12.5px;font-weight:800">No Makkah hotel matches</div>
+                  <div style="font-size:11.5px;color:var(--steel);margin-top:5px">Check the spelling, or enter the hotel manually.</div>
+                  <button class="btn btn-secondary" style="background:#fff;padding:7px 13px;margin-top:12px;white-space:nowrap">Enter manually</button>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">DATABASE UNAVAILABLE</div>
+                <div style="border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);background:#fdf8ef;padding:16px">
+                  <div style="font-size:12.5px;font-weight:800;color:var(--warn)">Hotel database not loaded</div>
+                  <div style="font-size:11.5px;color:var(--ink-3);margin-top:5px;line-height:1.55">assets/hotels.xlsx is missing. Manual entry stays available so work is never blocked.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Manual entry reveal</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div class="field"><label>AGENT NAME</label></div>
+                <div class="input" style="display:flex;align-items:center;justify-content:space-between;background:#fff">
+                  <span style="font-size:13px;color:var(--steel)">Select agent…</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <div style="font-size:11.5px;color:var(--steel);margin-top:6px">25 agents, each mapped to a serial prefix.</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div class="field"><label>AGENT NAME</label></div>
+                <div class="input" style="display:flex;align-items:center;justify-content:space-between;background:#fff">
+                  <span style="font-size:13px;font-weight:700">Other (Manual Entry)</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <div style="margin-top:10px;padding-left:12px;border-left:2px solid var(--cy);animation:opsFade .22s ease both">
+                  <div class="field"><label>TYPE AGENT NAME</label></div>
+                  <div class="input" style="background:#fff;font-size:13px;color:var(--steel)">Required — cannot be left empty</div>
+                  <div style="font-size:11.5px;color:var(--steel);margin-top:6px">Serial falls back to the first four letters.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Feedback — toast, dialog, skeleton</h3>
+            <hr class="hr">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+              <div style="background:#fff;border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600">TOASTS — TRANSIENT</div>
+                <div style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:11px 14px;box-shadow:0 10px 26px rgba(11,22,38,.22)">
+                  <span style="width:7px;height:7px;background:var(--ok);flex:none"></span>
+                  <span style="font-size:12.5px;font-weight:700">Record saved</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:11px 14px;box-shadow:0 10px 26px rgba(11,22,38,.22)">
+                  <span style="width:7px;height:7px;background:var(--danger);flex:none"></span>
+                  <span style="font-size:12.5px;font-weight:700">Save failed — nothing was written</span>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">CONFIRM DIALOG</div>
+                <div style="border:1px solid var(--line);box-shadow:0 14px 34px rgba(11,22,38,.14);padding:18px">
+                  <div style="font-size:14px;font-weight:800;margin-bottom:6px">Commit this record?</div>
+                  <div style="font-size:12.5px;color:var(--steel);line-height:1.55;margin-bottom:14px">A serial number will be assigned. Records cannot be edited from this app afterwards.</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn btn-primary" style="color:#fff;padding:8px 14px;white-space:nowrap">Commit record</button>
+                    <button class="btn btn-secondary" style="background:#fff;padding:8px 14px;white-space:nowrap">Keep editing</button>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);padding:20px">
+                <div style="font-size:9.5px;letter-spacing:.16em;color:var(--steel);font-weight:600;margin-bottom:12px">SKELETON</div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <span style="height:11px;width:62%;background:var(--line);animation:opsPulse 1.4s infinite"></span>
+                  <span style="height:11px;width:88%;background:var(--line);animation:opsPulse 1.4s infinite"></span>
+                  <span style="height:11px;width:74%;background:var(--line);animation:opsPulse 1.4s infinite"></span>
+                  <span style="height:11px;width:44%;background:var(--line);animation:opsPulse 1.4s infinite"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 style="font-size:20px;margin:0 0 4px">Records table — the eleven real columns</h3>
+            <hr class="hr">
+            <div style="background:#fff;border:1px solid var(--line);overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px">
+                <thead><tr style="border-bottom:2px solid var(--color-divider)">
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">SERIAL</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">AGENT</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">NAME</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">PASSPORT</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">VISA NO.</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">DEPARTURE</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">ARRIVAL</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">MAKKAH</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">MADINAH</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">TRANSPORT</th>
+                  <th style="text-align:left;padding:11px 14px;font-size:10px;letter-spacing:.1em;color:var(--steel);white-space:nowrap">VISA CO.</th>
+                </tr></thead>
+                <tbody><tr><td colspan="11" style="padding:44px;text-align:center">
+                  <div style="font-size:13px;font-weight:800">No records yet</div>
+                  <div style="font-size:12px;color:var(--steel);margin-top:5px">Rows are read from the live database. Passport numbers are masked except the last four characters.</div>
+                </td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSoon }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:620px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--cy);padding:40px">
+          <div style="font-size:9.5px;letter-spacing:.18em;color:var(--cy-6);font-weight:600">{{ soonTag }}</div>
+          <h3 style="font-size:26px;margin:12px 0 10px">{{ title }}</h3>
+          <p style="margin:0 0 20px;font-size:13.5px;color:var(--steel);line-height:1.6;text-wrap:pretty">{{ soonBody }}</p>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" onClick="{{ goAudit }}" style="color:#fff;padding:10px 18px;white-space:nowrap">Read the audit report</button>
+            <button class="btn btn-secondary" onClick="{{ goDash }}" style="background:#fff;padding:10px 18px;white-space:nowrap">Return to Dashboard</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;storageLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Local CSV — Sheets sync unverified&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Honesty&quot;}}">
+const PAGES = {
+  dash: ["Overview", "Operations Home"],
+  audit: ["Milestone 1", "Product Audit + UI Architecture Report"],
+  ds: ["Milestone 1", "Design Foundation"],
+  states: ["Milestone 1", "Component State Library"],
+  flight: ["Operations", "Flight Document Ops Pro"],
+  visa: ["Operations", "Visa & Contract Logger OP"],
+  hotels: ["Data & Resources", "Hotel Directory"],
+  activity: ["Data & Resources", "Recent Activity"],
+  settings: ["System", "Settings"],
+  help: ["System", "Help / User Guide"]
+};
+const SOON = {
+  flight: ["MILESTONE 2", "The full guided workflow — upload, extraction, journey review, accommodation, summary, generation and download — is built next, once the audit foundation is approved."],
+  visa: ["MILESTONE 3", "Operational details, visa upload and extraction, full-record review, confirmation and the records table are built after the flight module."],
+  hotels: ["MILESTONE 4", "The hotel directory renders the real Makkah and Madinah reference data. It stays empty until the hotel database is connected — no sample hotels are invented."],
+  activity: ["MILESTONE 4", "Activity lists generated itineraries and saved visa records from the live application, with passport numbers masked."],
+  settings: ["MILESTONE 4", "Storage connection, document template location and staff preferences. No API keys or credentials are ever shown here."],
+  help: ["MILESTONE 4", "Step-by-step guidance for both operational workflows, written for busy office conditions."]
+};
+
+class Component extends DCLogic {
+  state = { page: "dash" };
+  go(p) { return (e) => { if (e) e.preventDefault(); this.setState({ page: p }); }; }
+  nav(p) {
+    const on = this.state.page === p;
+    return "display:block;text-decoration:none;font-size:13px;font-weight:" + (on ? "800" : "600") +
+      ";padding:9px 10px;color:" + (on ? "#fff" : "#a9bccd") +
+      ";background:" + (on ? "rgba(30,155,215,.16)" : "transparent") +
+      ";border-left:2px solid " + (on ? "#1e9bd7" : "transparent") + ";transition:background .15s,color .15s";
+  }
+  renderVals() {
+    const p = this.state.page;
+    const meta = PAGES[p] || PAGES.dash;
+    const soon = SOON[p] || ["", ""];
+    return {
+      page: p, crumb: meta[0], title: meta[1],
+      storageLabel: this.props.storageLabel ?? "Local CSV — Sheets sync unverified",
+      isDash: p === "dash", isAudit: p === "audit", isDS: p === "ds", isStates: p === "states", isSoon: !!SOON[p],
+      soonTag: soon[0], soonBody: soon[1],
+      nDash: this.nav("dash"), nAudit: this.nav("audit"), nDS: this.nav("ds"), nStates: this.nav("states"),
+      nFlight: this.nav("flight"), nVisa: this.nav("visa"), nHotels: this.nav("hotels"),
+      nActivity: this.nav("activity"), nSettings: this.nav("settings"), nHelp: this.nav("help"),
+      goDash: this.go("dash"), goAudit: this.go("audit"), goDS: this.go("ds"), goStates: this.go("states"),
+      goFlight: this.go("flight"), goVisa: this.go("visa"), goHotels: this.go("hotels"),
+      goActivity: this.go("activity"), goSettings: this.go("settings"), goHelp: this.go("help")
+    };
+  }
+}
+
+</script>
+</body>
+</html>

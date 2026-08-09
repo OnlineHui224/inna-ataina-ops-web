@@ -1,0 +1,5 @@
+{
+    "template_path": "assets/blank_template.docx",
+    "output_directory": "output/",
+    "theme": "System"
+}
