@@ -84,12 +84,24 @@ tab_flights, tab_visas = st.tabs(["🎫 FLIGHT DOCUMENT OPS PRO", "🛂 VISA & C
 # TAB 1: FLIGHTS
 # ------------------------------------------
 with tab_flights:
-    T.section(st, "", "Generate Word Itineraries")
-    uploaded_files = st.file_uploader("Upload Travel Tickets (PDF, JPG, PNG)", type=["pdf", "jpg", "png"], accept_multiple_files=True, key="flight_up")
-    if uploaded_files:
-        T.file_chips(st, uploaded_files)
+    T.task_intro(
+        st,
+        "Flight Document Ops Pro",
+        "Generate Word Itineraries",
+        "Upload passenger ticket documents, extract the full journey and prepare a "
+        "professional itinerary for the traveller.",
+        ("PDF · JPG · PNG", "Multiple tickets supported"),
+    )
 
-    if st.button("1. Extract Flight Data"):
+    with st.container(border=True):
+        T.upload_head(st, "Upload travel ticket documents",
+                      "Drag and drop, or browse files. All tickets for one journey are read together.")
+        uploaded_files = st.file_uploader("Upload Travel Tickets (PDF, JPG, PNG)", type=["pdf", "jpg", "png"], accept_multiple_files=True, key="flight_up")
+        if uploaded_files:
+            T.doc_rows(st, uploaded_files)
+        extract_clicked = st.button("Extract Flight Data", type="primary")
+
+    if extract_clicked:
         if uploaded_files and len(uploaded_files) > 0:
             with st.spinner("OPS PRO is reading file(s)..."):
                 try:
@@ -108,32 +120,32 @@ with tab_flights:
     if st.session_state.extracted_data is not None:
         data = st.session_state.extracted_data
 
-        T.section(st, "", "Extracted Journey")
-        T.facts(st, [
-            ("PASSENGER", data.passenger_name),
-            ("PNR", data.pnr),
-            ("CARRIER", data.primary_carrier),
-            ("ADULTS", data.adults),
-            ("CHILDREN", data.children),
-            ("TOTAL PAX", data.total_pax),
-        ])
-        for f in data.flights:
-            T.flight_leg(st, f.departure_city, f.arrival_city, f.departure_time,
-                         f.arrival_time, f.date, f.carrier, f.flight_number)
+        st.markdown('<div class="ia-sublabel" style="margin-top:34px">Journey Summary</div>',
+                    unsafe_allow_html=True)
+        T.journey_summary(st, data.passenger_name, data.pnr, data.primary_carrier,
+                          data.adults, data.children, data.total_pax)
+
+        total_legs = len(data.flights)
+        for i, f in enumerate(data.flights, start=1):
+            T.segment(st, f.departure_city, f.arrival_city, f.departure_time,
+                      f.arrival_time, f.date, f.carrier, f.flight_number, i, total_legs)
         with st.expander("Raw extracted data"):
             st.json(data.model_dump() if hasattr(data, "model_dump") else data.dict())
 
-        st.markdown("<hr>", unsafe_allow_html=True)
         makkah_options, madinah_options = load_hotel_database()
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            group_name_input = st.text_input("Group Name (Optional)", placeholder="Type group name...")
-        with col2:
-            makkah_hotel_input = st.selectbox("Makkah Hotel", options=makkah_options)
-        with col3:
-            madinah_hotel_input = st.selectbox("Madinah Hotel", options=madinah_options)
+        st.markdown('<div class="ia-sublabel" style="margin-top:34px">Trip Details</div>',
+                    unsafe_allow_html=True)
+        with st.container(border=True):
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                group_name_input = st.text_input("Group Name (Optional)", placeholder="Type group name...")
+            with col2:
+                makkah_hotel_input = st.selectbox("Makkah Hotel", options=makkah_options)
+            with col3:
+                madinah_hotel_input = st.selectbox("Madinah Hotel", options=madinah_options)
+            generate_clicked = st.button("Generate Word Document", type="primary")
 
-        if st.button("2. Generate Word Document", type="primary"):
+        if generate_clicked:
             if DocxGenerator is None:
                 T.note(st, "bad", "<b>Docx Generator missing.</b>")
             else:
@@ -148,7 +160,7 @@ with tab_flights:
 
                         doc_file_path = generator.generate(st.session_state.extracted_data, m_mak, m_mad, group_name_input)
 
-                        T.note(st, "ok", f"<b>Itinerary ready — {os.path.basename(doc_file_path)}</b>")
+                        T.note(st, "ok", f"<b>Itinerary ready.</b> {os.path.basename(doc_file_path)}")
                         with open(doc_file_path, "rb") as file:
                             st.download_button("📥 Download Itinerary (Word Doc)", data=file, file_name=os.path.basename(doc_file_path), mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     except Exception as e:
@@ -158,11 +170,20 @@ with tab_flights:
 # TAB 2: VISAS & LOGISTICS
 # ------------------------------------------
 with tab_visas:
+    T.task_intro(
+        st,
+        "Visa & Contract Logger OP",
+        "Log Visa & Contract Details",
+        "Extract visa identity details and sync the completed operational record to the "
+        "master database.",
+    )
+
     # Cloud URL Input (Hardcoded permanently)
-    T.section(st, "", "Cloud Configuration")
-    T.status_badge(st, "MASTER DATABASE", "Securely connected to Master Live Google Sheet")
+    T.connection_card(st, "Master Database",
+                      "Securely connected to Master Live Google Sheet", "Connected")
     gsheet_url = "https://docs.google.com/spreadsheets/d/1_w-171YwDfTMP5OEwZv8khCOB_pUgvjKtZtgTFOzPeI/edit"
-    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown('<div class="ia-sublabel" style="margin-top:32px">Operational Details</div>',
+                unsafe_allow_html=True)
 
     AGENT_LIST = [
         "Select Agent...", "Inna-Ataina", "AshTag", "Al-Mubarak", "Seriki Group",
@@ -187,7 +208,7 @@ with tab_visas:
     colA, colB = st.columns(2)
     with colA:
       with st.container(border=True):
-        T.group_label(st, "Agent & Package")
+        T.panel_head(st, "Agent & Package")
         sel_agent = st.selectbox("Agent Name", options=AGENT_LIST)
         final_agent = st.text_input("Type Agent Name:") if sel_agent == "Other (Manual Entry)" else sel_agent
 
@@ -199,7 +220,7 @@ with tab_visas:
 
     with colB:
       with st.container(border=True):
-        T.group_label(st, "Accommodation")
+        T.panel_head(st, "Accommodation")
         sel_makkah = st.selectbox("Makkah Hotel (Visa Log)", options=makkah_options, key="v_mak")
         final_makkah = st.text_input("Type Makkah Hotel:") if sel_makkah == "Other (Manual Entry)" else sel_makkah
 
@@ -207,18 +228,26 @@ with tab_visas:
         sel_madinah = st.selectbox("Madinah Hotel (Visa Log)", options=madinah_options, key="v_mad")
         final_madinah = st.text_input("Type Madinah Hotel:") if sel_madinah == "Other (Manual Entry)" else sel_madinah
 
-    col_dep, col_arr = st.columns(2)
-    with col_dep:
-        date_dep = st.date_input("Departure Date")
-    with col_arr:
-        date_arr = st.date_input("Arrival Date")
+    st.markdown('<div class="ia-sublabel" style="margin-top:24px">Travel Dates</div>',
+                unsafe_allow_html=True)
+    with st.container(border=True):
+        col_dep, col_arr = st.columns(2)
+        with col_dep:
+            date_dep = st.date_input("Departure Date")
+        with col_arr:
+            date_arr = st.date_input("Arrival Date")
 
-    st.markdown("<hr>", unsafe_allow_html=True)
-    visa_file = st.file_uploader("Upload Visa Document (PDF/Image)", type=["pdf", "jpg", "png"], key="visa_up")
-    if visa_file is not None:
-        T.file_chips(st, [visa_file])
+    st.markdown('<div class="ia-sublabel" style="margin-top:24px">Visa Document</div>',
+                unsafe_allow_html=True)
+    with st.container(border=True):
+        T.upload_head(st, "Upload the visa document",
+                      "Drag and drop, or browse files. One document per record.")
+        visa_file = st.file_uploader("Upload Visa Document (PDF/Image)", type=["pdf", "jpg", "png"], key="visa_up")
+        if visa_file is not None:
+            T.doc_rows(st, [visa_file])
+        sync_clicked = st.button("Extract Visa & Sync to Cloud", type="primary")
 
-    if st.button("🚀 Extract Visa & Sync to Cloud", type="primary"):
+    if sync_clicked:
         if visa_file is None:
             T.note(st, "bad", "<b>Upload a Visa document first!</b>")
         elif "Select" in final_agent or "Select" in final_transport or "Select" in final_visa_comp:
@@ -257,15 +286,14 @@ with tab_visas:
                         serial = str(df_updated.iloc[-1]["SERIAL NUMBER"])
                     except Exception:
                         serial = "—"
-                    T.facts(st, [
-                        ("SERIAL NUMBER", serial),
-                        ("NAME", visa_data.get("NAME", "—")),
-                        ("PASSPORT NUMBER", visa_data.get("PASSPORT NUMBER", "—")),
-                        ("VISA NUMBER", visa_data.get("VISA NUMBER", "—")),
-                    ])
+                    T.record_summary(st, serial, visa_data.get("NAME", "—"),
+                                     visa_data.get("PASSPORT NUMBER", "—"),
+                                     visa_data.get("VISA NUMBER", "—"))
 
                     # Display a quick preview on the screen
-                    T.section(st, "", "Cloud Database Preview (Last 5 Entries)")
+                    st.markdown('<div class="ia-sublabel" style="margin-top:28px">'
+                                'Cloud Database Preview · Last 5 Entries</div>',
+                                unsafe_allow_html=True)
                     st.dataframe(df_updated.tail(5), use_container_width=True, hide_index=True)
 
                 except Exception as e:
